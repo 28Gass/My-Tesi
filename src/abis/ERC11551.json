@@ -1,0 +1,130 @@
+{
+  "contractName": "ERC11551",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"details\":\"Implementation of the basic standard multi-token. See https://eips.ethereum.org/EIPS/eip-1155 Originally based on code by Enjin: https://github.com/enjin/erc-1155 _Available since v3.1._\",\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/src/contracts/1/LItemUtils.sol\":\"ERC11551\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/src/contracts/1/LItemUtils.sol\":{\"keccak256\":\"0xd6d8b6c2f4e904648a77e47ae27383927a903fbc54cf3c8ae59f13d1ee9703df\",\"urls\":[\"bzz-raw://521c684b0a7b72970c42119e05887f7cce74857f35f9555436a802a7a659a1dd\",\"dweb:/ipfs/QmY3QhMHDUk5PCZfa7Lp6UZxPbpXmxyC7t7HwfhLpftcKY\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122021c4471d8d5d96448946ed49f0edc47ddbb5f817dc0bdb0499fbeb1319deb2f964736f6c63430008090033",
+  "deployedBytecode": "0x6080604052600080fdfea264697066735822122021c4471d8d5d96448946ed49f0edc47ddbb5f817dc0bdb0499fbeb1319deb2f964736f6c63430008090033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "261:28:11:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "261:28:11:-:0;;;;;",
+  "source": "\r\n\r\n\r\n\r\n\r\npragma solidity ^0.8.0;\r\n\r\n\r\n/**\r\n * @dev Implementation of the basic standard multi-token.\r\n * See https://eips.ethereum.org/EIPS/eip-1155\r\n * Originally based on code by Enjin: https://github.com/enjin/erc-1155\r\n *\r\n * _Available since v3.1._\r\n */\r\ncontract ERC11551  {\r\n \r\n\r\n}\r\n\r\n\r\n\r\n\r\n\r\n",
+  "sourcePath": "C:\\Users\\Luca\\Desktop\\tesi\\My-tesi\\src\\contracts\\1\\LItemUtils.sol",
+  "ast": {
+    "absolutePath": "project:/src/contracts/1/LItemUtils.sol",
+    "exportedSymbols": {
+      "ERC11551": [
+        1695
+      ]
+    },
+    "id": 1696,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1693,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "10:23:11"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ERC11551",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 1694,
+          "nodeType": "StructuredDocumentation",
+          "src": "39:220:11",
+          "text": " @dev Implementation of the basic standard multi-token.\n See https://eips.ethereum.org/EIPS/eip-1155\n Originally based on code by Enjin: https://github.com/enjin/erc-1155\n _Available since v3.1._"
+        },
+        "fullyImplemented": true,
+        "id": 1695,
+        "linearizedBaseContracts": [
+          1695
+        ],
+        "name": "ERC11551",
+        "nameLocation": "270:8:11",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 1696,
+        "src": "261:28:11",
+        "usedErrors": []
+      }
+    ],
+    "src": "10:291:11"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/src/contracts/1/LItemUtils.sol",
+    "exportedSymbols": {
+      "ERC11551": [
+        1695
+      ]
+    },
+    "id": 1696,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1693,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "10:23:11"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ERC11551",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 1694,
+          "nodeType": "StructuredDocumentation",
+          "src": "39:220:11",
+          "text": " @dev Implementation of the basic standard multi-token.\n See https://eips.ethereum.org/EIPS/eip-1155\n Originally based on code by Enjin: https://github.com/enjin/erc-1155\n _Available since v3.1._"
+        },
+        "fullyImplemented": true,
+        "id": 1695,
+        "linearizedBaseContracts": [
+          1695
+        ],
+        "name": "ERC11551",
+        "nameLocation": "270:8:11",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 1696,
+        "src": "261:28:11",
+        "usedErrors": []
+      }
+    ],
+    "src": "10:291:11"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.9+commit.e5eed63a.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-11-04T14:50:25.538Z",
+  "devdoc": {
+    "details": "Implementation of the basic standard multi-token. See https://eips.ethereum.org/EIPS/eip-1155 Originally based on code by Enjin: https://github.com/enjin/erc-1155 _Available since v3.1._",
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
