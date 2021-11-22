@@ -16,7 +16,7 @@ contract LoanItem is ERC1155{
     mapping(address => bool) public hasStaked;
     mapping(address => bool) public isStaking;
     
-    // mapping(uint256 => string) public Available;
+   
      mapping(uint => Image)public images;
      mapping(uint => TokenNFT)public tokenId;
      mapping(uint => address)public CautionId;
@@ -26,7 +26,7 @@ contract LoanItem is ERC1155{
 
      mapping(uint256 => CoinFT) public CoinId;
      mapping(uint256 => uint256) public Cds;
-     //mapping(uint256=>mapping(uint256=>address)) public Preorderstart;
+   
 
 
     struct Image {
@@ -151,16 +151,17 @@ contract LoanItem is ERC1155{
         emit TokenNFTCreated(countAttrezzi,images[imageCount],_description,namef,price,caution,Cid);    
     }
    
-      function TrasferTest(address _from, address _to, uint256 _id) external {
+      function TrasferTest(address _from, address _to, uint256 _id,bool pre,bool acq) external {
 
         //aggiungere il metodo che controlla le prenotazioni 
 
-          require(address(_from)!=address(0x0), "Error trasfer address _from is 0x0");
-          require(address(_to)!=address(0x0), "Error trasfer address _to is 0x0");
-          require(uint256(_id) > 0, "Error trasfer token id is 0");  
-          require(keccak256(bytes(Calendario.Available(_id))) != keccak256(bytes("Waiting")),"Error token Available is waiting ");
+          require(address(_from)!=address(0x0), "address _from is 0x0");
+          require(address(_to)!=address(0x0), "address _to is 0x0");
+          require(uint256(_id) > 0, "token id is 0");  
+          require(keccak256(bytes(Calendario.Available(_id))) != keccak256(bytes("Waiting")),"token is waiting ");
           
           if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
+            //riconsegna item
             bool l;
             l =  Calendario.setAvailable(_id,"Waiting"); 
             require(l == true, "Non disponibile1");
@@ -168,8 +169,20 @@ contract LoanItem is ERC1155{
             safeTransferFrom( _from,_to, _id,1,"");
             CautionId[_id]= _from;
             }
-            else if(_from == owner){
-              require(tokenId[_id].pricel+tokenId[_id].caution<= balanceOf(_to,tokenId[_id].Cid),"bilancio non sufficente"); 
+            else if(_from == owner/*&& Calendario.CheckAvialable()*/){
+              if(pre && !(acq)){
+                /*&& Calendario.Pre_Order();*/
+              safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
+              CautionId[_id]= _to;
+                return;
+              }
+              if(acq && !(pre)){
+                //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
+                //e poi pagare l'oggetto 
+                
+
+              }
+              //require(tokenId[_id].pricel+tokenId[_id].caution<= balanceOf(_to,tokenId[_id].Cid),"bilancio non sufficente"); 
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel+tokenId[_id].caution,"");  
               safeTransferFrom( _from,_to, _id,1,"");
              
@@ -191,13 +204,13 @@ contract LoanItem is ERC1155{
         require(_id>0,"");
         require(_id<=countAttrezzi,"item not exists");
         require(ids[_id]>0,"Token not exists" );
-        require(keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Waiting")));
+       
+       Calendario.Relese(_id);
 
         safeTransferFrom( msg.sender,CautionId[_id], 1, tokenId[_id].caution,"");
         CautionId[_id]= address(0x0);
-          bool k;
-          k =  Calendario.setAvailable(_id,"Available"); 
-          require(k == true, "Non disponibile3");
+         
+         
       }
     
    

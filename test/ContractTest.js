@@ -65,15 +65,15 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
         aprove = await loanitem.isApprovedForAll(account[0],account[1]) 
         assert.equal(aprove,true) 
 
-        await loanitem.TrasferTest(account[0],account[1],2,{from: account[1]})
+        await loanitem.TrasferTest(account[0],account[1],2,0,0,{from: account[1]})
        
-         await loanitem.TrasferTest(account[0],account[1],3,{from: account[1]})
+         await loanitem.TrasferTest(account[0],account[1],3,0,0,{from: account[1]})
 
         await loanitem.setApprovalForAll(account[0],true,{from: account[1]})//account [1] to account  [0] = true
          aprove = await loanitem.isApprovedForAll(account[1],account[0])
         assert.equal(aprove,true)
 
-        await loanitem.TrasferTest(account[1],account[0],2,{from: account[1]})
+        await loanitem.TrasferTest(account[1],account[0],2,0,0,{from: account[1]})
         
         await loanitem.setApprovalForAll(account[0],false,{from: account[1]})//account [1] to account  [0] = false
         aprove = await loanitem.isApprovedForAll(account[1],account[0])
@@ -558,14 +558,14 @@ await test();
             })
              })
 
-              describe('Preorder with Transaction link LoanItem to Calendar', async()=>{
+              describe('Preorder with Transaction from LoanItem', async()=>{
 
                 //da implementare 
-                /*--Quando volgio prenotare da loanItem bisognerà pagare la cauzione in anticipo---
-                ----controllare con una funzione update controlla le varie scadenze sopratutto un pre-ordine non ritirato---  
-                Una volta acquisito il pre-ordine sarà uguale ad un'acquisto normale---
-                Sugli acquisti normali implementare le date in cui si intende tenere l'oggetto---
-                prezzi in base ai giorni/slot. */
+                /*--Quando volgio prenotare da loanItem bisognerà pagare la cauzione in anticipo--- LOANITEM
+                Una volta acquisito il pre-ordine sarà uguale ad un'acquisto normale--- LOAN ITEM MA CAUZIONE UNA SOLA VOLTA
+                Sugli acquisti normali implementare le date in cui si intende tenere l'oggetto---LOANITEM
+                ----controllare con una funzione update controlla le varie scadenze sopratutto un pre-ordine non ritirato--- CALENDAR
+                prezzi in base ai giorni/slot. LOANITEM AND CALENDAR */
                  it('',async()=>{})
 
               })

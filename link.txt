@@ -32,3 +32,8 @@ https://soliditydeveloper.com/max-contract-size
 ---------cach------------
 di eventi 
 https://stackoverflow.com/questions/35545625/event-triggering-in-solidity
+
+
+
+
+https://github.com/28Gass/My-Tesi/settings/access
