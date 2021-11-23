@@ -11,7 +11,7 @@ contract Calendar   {
     uint256 time;
     uint256 fusoorario;
     uint256[] Status;
-
+    uint256 Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
 		    
 
@@ -36,7 +36,9 @@ contract Calendar   {
     uint256 date2 = Converter(dataEnd,true);
 
 		require(date1<date2,"<");//la prenotazione vale almeno se dura 4 ore
-      
+      if(_id>Orders)
+        Orders= _id;
+
         if(CheckAvialable(_id,date1,date2)){
     PreorderOpen[_id].push(date1);
 		Preorderstart[_id][date1]= msg.sender;
@@ -87,8 +89,29 @@ contract Calendar   {
 
 	}	
 	function Update()internal {
-				
-			}
+		//controllo che i preOrdini aperti siano scaduti
+		//se si li cancello e li metto in waiting in attesa che
+		//la cauzione venga restituita
+		for(uint256 i; i<= Orders; i++){
+		    if(keccak256(bytes(Available[i])) == keccak256(bytes("Preordered"))){
+		    	for(uint256 j;j < PreorderOpen[i].length; j++){
+				Time();
+				if(time - 86400 >= PreorderOpen[i][j]){//caso in cui sia passato un giorno senza aver 
+											    //ritirato item adrò ad annullare la prenotazione
+
+				Preorderstart[i][PreorderOpen[i][j]]= address(0);
+				Preorderend[i][PreorderOpen[i][j]]=0;
+				Available[i]="Waiting";
+				delete PreorderOpen[i][j];
+				}
+                      //Preorderstart[][]= address(0);
+                      //Preorderend[][].delete();
+                     // delete  Preorderend[][];
+                     //eliminazione su preorderOpen
+
+				}
+			}}
+		    }
 	function setAvailable(uint256 idA,string memory Status)public returns(bool){
 	if(keccak256(bytes(Status)) == keccak256(bytes("Busy"))||keccak256(bytes(Status)) == keccak256(bytes("Available"))||keccak256(bytes(Status)) == keccak256(bytes("Waiting")) ){
 			Available[idA]=Status;
@@ -124,11 +147,21 @@ function Converter(uint256 date, bool next)public returns(uint256){
                                //alle 20
                                return date1;
 }
-function AcquirePre(uint256 _dateS,uint256 idP) public returns(bool ret){
+function AcquirePre(uint256 _dateS,uint256 idP,address usr) public returns(bool ret){
 	ret = false;
 	Time();
-  
-  uint256 time1 = Converter(time,false);
+  	uint256 time1 = Converter(time,false);
+  	uint256 time2 = Converter(_dateS,true);
+      
+
+  	if(_dateS>=time){
+  		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
+  		if(Preorderstart[idP][PreorderOpen[idP][i]]==usr && PreorderOpen[idP][i]+86400 >= time2){
+  												//dopo un giorno dalla scadenza viene cancellato il pre-order
+  			return true;
+  		}
+		}
+  	}
 //PreorderOpen verificare la data che ci sia come il proprietario del pre-ordine sia 
 //quello giusto
 

@@ -16,7 +16,7 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
  	let account = await web3.eth.getAccounts()
     calendar= await  LItemCalendar.new()
     loanitem = await LoanItem.new(account[0],calendar.address)
-    litemadd = await LItemUtils.new(loanitem.address)
+    litemadd = await LItemUtils.new(loanitem.address,calendar.address)
     
    
    await loanitem.addNewCoin(web3.utils.toWei("1000000", 'Ether'),"FToken","best Token",{from: account[0]});
@@ -276,9 +276,11 @@ await test();
            console.log("           giorno attuale allo slot successivo:  "+test1)
             // await new Promise(resolve => setTimeout(resolve, 4000));
 
-            
+            })
         
          })
+
+describe('TEST PRE-ORDINI Calendar', async()=>{
          it('Test Pre-Order item 8',async()=>{
             await litemadd.Time()
             let time = await litemadd.createtime()
@@ -313,7 +315,7 @@ await test();
             assert.equal(set,account[0])
             set = await calendar.Preorderend(8,date1)
             assert.equal(set,date2)
-            
+            //prenotazione riuscita
         
          
              
@@ -411,6 +413,7 @@ await test();
             await calendar.Pre_Order(time,timend,8,{from:account[1]})
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
+            //pre_ordine non riuscito
 
 
             })
@@ -439,6 +442,7 @@ await test();
              await calendar.Pre_Order(time,timend,8,{from:account[1]})
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
+            //pre ordine non riuscito
 
             })
               it('Provo a prenotare in una finestra più grande',async()=>{
@@ -467,6 +471,7 @@ await test();
              await calendar.Pre_Order(time,timend,8,{from:account[1]})
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
+            //pre ordine non riuscito 
 
               })
 
@@ -525,7 +530,7 @@ await test();
                await calendar.Pre_Order(time,timend,8,{from:account[2]})
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,account[2])
-
+            //pre_ordine riuscito
 
                  })
             it('Provo a collidere su due finestre',async()=>{
@@ -554,9 +559,14 @@ await test();
             set = await calendar.Preorderstart(8,date1)
 
              assert.equal(set,"0x0000000000000000000000000000000000000000")
-
+                //pre ordine non riuscito
             })
              })
+            describe('TEST Update Calendar', async()=>{
+                 it('',async()=>{
+
+                 })
+                })
 
               describe('Preorder with Transaction from LoanItem', async()=>{
 

@@ -9,21 +9,27 @@ pragma solidity ^0.8.0;
 
 
 import "./LoanItem.sol";
-
+import"./LitemCalendar.sol";
 
  contract LItemUtils   {
    address public owner;
    uint256 public createtime;
    LoanItem loanItem;
+   Calendar Calendario;
    uint256 fusoorario;
 
-  constructor(LoanItem LItem) public {  
+  constructor(LoanItem LItem,Calendar calendario) public {  
   owner = msg.sender;
   loanItem = LItem;
+  Calendario = calendario;
          }
 
    function Time() external {
         createtime = block.timestamp+ fusoorario;
+      }
+
+   function Update() public {
+        //createtime = block.timestamp+ fusoorario;
       }
 
    function setFusoOraio()public{

@@ -3,7 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import"./LItemUtils.sol";
 import"./LitemCalendar.sol";
 contract LoanItem is ERC1155{
     
@@ -165,12 +164,13 @@ contract LoanItem is ERC1155{
             bool l;
             l =  Calendario.setAvailable(_id,"Waiting"); 
             require(l == true, "Non disponibile1");
-
+            //chiamare update
             safeTransferFrom( _from,_to, _id,1,"");
             CautionId[_id]= _from;
             }
             else if(_from == owner/*&& Calendario.CheckAvialable()*/){
-              if(pre && !(acq)){
+              if(pre && !(acq)){//preOrder pago la cauzione in anticipo
+
                 /*&& Calendario.Pre_Order();*/
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
               CautionId[_id]= _to;
@@ -179,9 +179,13 @@ contract LoanItem is ERC1155{
               if(acq && !(pre)){
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
                 //e poi pagare l'oggetto 
-                
+                if(Calendario.AcquirePre(0,_id,msg.sender)){
 
+
+                }
+                return;
               }
+
               //require(tokenId[_id].pricel+tokenId[_id].caution<= balanceOf(_to,tokenId[_id].Cid),"bilancio non sufficente"); 
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel+tokenId[_id].caution,"");  
               safeTransferFrom( _from,_to, _id,1,"");
