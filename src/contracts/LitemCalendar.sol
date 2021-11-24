@@ -26,7 +26,11 @@ contract Calendar   {
   	function Time() internal {
         time = block.timestamp+ fusoorario;
       }
-
+	/*Funzione per testare le scadenze in update*/
+    /*
+      function TimeAdd(uint256 i) public {
+        time = time + i;
+      }*/
 
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id)  external returns(bool suc) {
     suc = false;
@@ -88,26 +92,23 @@ contract Calendar   {
 		//creare un evento per data suggerita nel caso l'item non sia disponibile
 
 	}	
-	function Update()internal {
+	function Update()public {
 		//controllo che i preOrdini aperti siano scaduti
 		//se si li cancello e li metto in waiting in attesa che
 		//la cauzione venga restituita
 		for(uint256 i; i<= Orders; i++){
 		    if(keccak256(bytes(Available[i])) == keccak256(bytes("Preordered"))){
 		    	for(uint256 j;j < PreorderOpen[i].length; j++){
-				Time();
+				  Time();
 				if(time - 86400 >= PreorderOpen[i][j]){//caso in cui sia passato un giorno senza aver 
 											    //ritirato item adrò ad annullare la prenotazione
 
-				Preorderstart[i][PreorderOpen[i][j]]= address(0);
-				Preorderend[i][PreorderOpen[i][j]]=0;
+				delete Preorderstart[i][PreorderOpen[i][j]];
+				delete Preorderend[i][PreorderOpen[i][j]];
 				Available[i]="Waiting";
 				delete PreorderOpen[i][j];
 				}
-                      //Preorderstart[][]= address(0);
-                      //Preorderend[][].delete();
-                     // delete  Preorderend[][];
-                     //eliminazione su preorderOpen
+                     
 
 				}
 			}}
@@ -135,7 +136,7 @@ function Relese(uint256 _id1) external{
           k = setAvailable(_id1,"Available"); 
           require(k == true, "Non disponibile3");
 }
-function Converter(uint256 date, bool next)public returns(uint256){
+function Converter(uint256 date, bool next)public view virtual returns(uint256){
      uint256 lest;
      if(next)
      lest = 14400;
@@ -166,7 +167,10 @@ function AcquirePre(uint256 _dateS,uint256 idP,address usr) public returns(bool 
 //quello giusto
 
 
-
 }
 	
+	function preOrderOpenGet(/*uint256 i*/) external  view virtual returns(uint256[] memory){
+     
+  return  PreorderOpen[8];
+	}
 }

@@ -305,6 +305,8 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             let date1 = time % 86400
             date1 = date1 % 14400
             date1 = time - date1 + 14400
+
+            //console.log("data Inizio :" + date1)
   
             let date2 = timend % 86400
             date2 = date2 % 14400
@@ -485,10 +487,8 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             let timend = time.toNumber()
             timend = timend + 172800
             time = time.toNumber()
-            time = time + 158400
+            time = time + 158400 
             
-
-       
             let date1 = time % 86400
             date1 = date1 % 14400
             date1 = time - date1 + 14400 
@@ -501,7 +501,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
              await calendar.Pre_Order(time,timend,8,{from:account[1]})
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,account[1])
-
+            //prenotazione riuscita
 
              })
                  it('Provo a in mezzo altre due finestre',async()=>{
@@ -563,8 +563,54 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             })
              })
             describe('TEST Update Calendar', async()=>{
-                 it('',async()=>{
+                 it('test Cancellazione Prenotazioni scadute',async()=>{
+                
+/*------------------Per far funzionare il test mettere i commenti su Time()--------------------
+                    all'interno di update(LitmeCalendar.sol) e togliere i commenti della funzione
+                    TimeAdd() per poter manipolare il tempo */
 
+                    /*
+                  await litemadd.Time()
+                   let orario = await litemadd.createtime()
+                   let tester1 = await calendar.preOrderOpenGet()
+                    orario = await calendar.Converter(orario,true)
+                   orario = orario.toNumber()
+                   orario =orario +  28800
+                    //console.log("Orario1 : "+orario)
+                    assert.equal(tester1[0].toNumber(),orario)
+                    
+                    // console.log("orario :" + orario)
+                     orario =orario + 129600 - 28800
+                    
+                    assert.equal(tester1[2].toNumber(),orario)
+                    
+                    orario = orario - 129600 + 158400
+                  
+                     assert.equal(tester1[1].toNumber(),orario)
+
+                    // assert.equal(tester1[2].toNumber(),orario)
+                  
+                   
+                    await calendar.TimeAdd(144000)
+                    await calendar.Update()
+
+                   let oner= tester1[0]
+                   tester1 = await calendar.preOrderOpenGet()
+                   //-------item 8---prenotazione Scaduta---------
+                   assert.equal(tester1[0].toNumber(),0)
+                  //assert.equal(tester1[2].toNumber(),1637913600)
+                   assert.equal(tester1[1].toNumber(),orario)
+
+                   //orario = orario - 158400 + 28800
+                   
+                
+                   let one =  await calendar.Preorderstart(8,oner)
+
+                   assert.equal(one,"0x0000000000000000000000000000000000000000")
+                    one =  await calendar.Preorderend(8,oner)
+                     assert.equal(one,0)
+                     one =  await calendar.Available(8)
+                      assert.equal(one,"Waiting")*/
                  })
                 })
 
