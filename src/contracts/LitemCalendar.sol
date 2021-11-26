@@ -8,7 +8,7 @@ contract Calendar   {
 	  mapping(uint256=>mapping(uint256=>address)) public Preorderstart;
 	  mapping(uint256=>mapping(uint256=>uint256)) public Preorderend;
     mapping(uint256 => string) public Available;
-    uint256 time;
+    uint256 public time;
     uint256 fusoorario;
     uint256[] Status;
     uint256 Orders;
@@ -23,14 +23,13 @@ contract Calendar   {
 
 
 	}
-  	function Time() internal {
+  	function Time() public {
         time = block.timestamp+ fusoorario;
       }
 	/*Funzione per testare le scadenze in update*/
    
       function TimeAdd(uint256 i) public {
-        if(time ==0)
-        Time();
+        
         time = time + i;
       }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id)  external returns(bool suc) {
@@ -97,10 +96,11 @@ contract Calendar   {
 		//controllo che i preOrdini aperti siano scaduti
 		//se si li cancello e li metto in waiting in attesa che
 		//la cauzione venga restituita
+		Time();
 		for(uint256 i; i<= Orders; i++){
 		    if(keccak256(bytes(Available[i])) == keccak256(bytes("Preordered"))){
 		    	for(uint256 j;j < PreorderOpen[i].length; j++){
-				  Time();
+				  
 				if(time - 86400 >= PreorderOpen[i][j]){//caso in cui sia passato un giorno senza aver 
 											    //ritirato item adrò ad annullare la prenotazione
 
@@ -149,22 +149,23 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
                                //alle 20
                                return date1;
 }
-function AcquirePre(uint256 _dateS,uint256 idP,address usr) public   returns(bool ret){
+function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
 	Time();
   Update();
-  	uint256 time2 = Converter(_dateS,true);
+  	
       
 
-  	if(time2>time - 2592000 /*non più vecchio di 30g*/  &&time>=time2 && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
+  	
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
   		if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
+  			if( time>=PreorderOpen[idP][i] && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
   		Available[idP]="Busy";							
-  			return true;
+  			return true;}
   		}
 		}
-		return ret;
-  	}
+
+  	
 //PreorderOpen verificare la data che ci sia come il proprietario del pre-ordine sia 
 //quello giusto
 

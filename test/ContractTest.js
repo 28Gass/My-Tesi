@@ -306,7 +306,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date1 = date1 % 14400
             date1 = time - date1 + 14400
 
-            //console.log("data Inizio :" + date1)
+            console.log("data Inizio :" + date1)
   
             let date2 = timend % 86400
             date2 = date2 % 14400
@@ -617,22 +617,25 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                     //per far funzionare il test manipolo l'ora quindi bisogna commentare Time() in AcquirePre e 
                     //togliere i commenti in timeAdd() e commentare update()
                     /*let account = await web3.eth.getAccounts()
-                           await litemadd.Time()
-                           await calendar.TimeAdd(28800)
-                   let orario = await litemadd.createtime()
+                           await calendar.Time()
+                            let orario = await calendar.time()
+                             //console.log("ora1  "+orario)
+                           await calendar.TimeAdd(48800)
+                      orario = await calendar.time()
+                            //console.log("ora2  "+orario)
+
                    orario = orario.toNumber()
 
-                   
+                  
 
-
-                    orario = await calendar.Converter(orario,true)
+                    orario = await calendar.Converter(orario,false)
                    
-                     await calendar.AcquirePre(orario,8,account[0])
+                     await calendar.AcquirePre(8,account[0])
 
                    let tes = await calendar.Available(8)
-                   assert.equal(tes,"Busy")*/
+                   assert.equal(tes,"Busy")
 
-
+                    */
                      })
 
                 })
