@@ -562,8 +562,8 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                 //pre ordine non riuscito
             })
              })
-            describe('TEST Update Calendar', async()=>{
-                 it('test Cancellazione Prenotazioni scadute',async()=>{
+            describe('TEST  Calendar', async()=>{
+                 it('test Cancellazione Prenotazioni scadute--Update--',async()=>{
                 
 /*------------------Per far funzionare il test mettere i commenti su Time()--------------------
                     all'interno di update(LitmeCalendar.sol) e togliere i commenti della funzione
@@ -612,6 +612,29 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                      one =  await calendar.Available(8)
                       assert.equal(one,"Waiting")*/
                  })
+                     it('Test Acquire preOrder',async()=>{
+                    //provo ad acquisire l'ordine dopo aver prenotato ed nel momento in cui arriva l'ora
+                    //per far funzionare il test manipolo l'ora quindi bisogna commentare Time() in AcquirePre e 
+                    //togliere i commenti in timeAdd() e commentare update()
+                    /*let account = await web3.eth.getAccounts()
+                           await litemadd.Time()
+                           await calendar.TimeAdd(28800)
+                   let orario = await litemadd.createtime()
+                   orario = orario.toNumber()
+
+                   
+
+
+                    orario = await calendar.Converter(orario,true)
+                   
+                     await calendar.AcquirePre(orario,8,account[0])
+
+                   let tes = await calendar.Available(8)
+                   assert.equal(tes,"Busy")*/
+
+
+                     })
+
                 })
 
               describe('Preorder with Transaction from LoanItem', async()=>{

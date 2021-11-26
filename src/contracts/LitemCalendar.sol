@@ -27,11 +27,12 @@ contract Calendar   {
         time = block.timestamp+ fusoorario;
       }
 	/*Funzione per testare le scadenze in update*/
-    /*
+   
       function TimeAdd(uint256 i) public {
+        if(time ==0)
+        Time();
         time = time + i;
-      }*/
-
+      }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id)  external returns(bool suc) {
     suc = false;
     time =block.timestamp-10 + fusoorario;
@@ -148,25 +149,26 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
                                //alle 20
                                return date1;
 }
-function AcquirePre(uint256 _dateS,uint256 idP,address usr) public returns(bool ret){
+function AcquirePre(uint256 _dateS,uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
 	Time();
-  	uint256 time1 = Converter(time,false);
+  Update();
   	uint256 time2 = Converter(_dateS,true);
       
 
-  	if(_dateS>=time){
+  	if(time2>time - 2592000 /*non più vecchio di 30g*/  &&time>=time2 && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
-  		if(Preorderstart[idP][PreorderOpen[idP][i]]==usr && PreorderOpen[idP][i]+86400 >= time2){
-  												//dopo un giorno dalla scadenza viene cancellato il pre-order
+  		if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
+  		Available[idP]="Busy";							
   			return true;
   		}
 		}
+		return ret;
   	}
 //PreorderOpen verificare la data che ci sia come il proprietario del pre-ordine sia 
 //quello giusto
 
-
+	return ret;
 }
 	
 	function preOrderOpenGet(/*uint256 i*/) external  view virtual returns(uint256[] memory){

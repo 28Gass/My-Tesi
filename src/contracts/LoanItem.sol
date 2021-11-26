@@ -168,6 +168,10 @@ contract LoanItem is ERC1155{
             safeTransferFrom( _from,_to, _id,1,"");
             CautionId[_id]= _from;
             }
+            else if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
+              //caso in cui voglio cancellare una prenotazione
+
+            }
             else if(_from == owner/*&& Calendario.CheckAvialable()*/){
               if(pre && !(acq)){//preOrder pago la cauzione in anticipo
 
