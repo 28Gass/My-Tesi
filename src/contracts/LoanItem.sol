@@ -150,23 +150,22 @@ contract LoanItem is ERC1155{
         emit TokenNFTCreated(countAttrezzi,images[imageCount],_description,namef,price,caution,Cid);    
     }
    
-      function TrasferTest(address _from, address _to, uint256 _id,bool pre,bool acq) external {
+      function TrasferTest(address _from, address _to, uint256 _id,bool pre,bool acq,uint256 dateS,uint256 dateF) external {
 
         //aggiungere il metodo che controlla le prenotazioni 
 
-          require(address(_from)!=address(0x0), "address _from is 0x0");
-          require(address(_to)!=address(0x0), "address _to is 0x0");
-          require(uint256(_id) > 0, "token id is 0");  
+          //require(address(_from)!=address(0x0), "address _from is 0x0");
+          //require(address(_to)!=address(0x0), "address _to is 0x0");
+          require(keccak256(bytes(tokenId[_id].namet))> 0, "token not true");  
           require(keccak256(bytes(Calendario.Available(_id))) != keccak256(bytes("Waiting")),"token is waiting ");
           
-          if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
+          if(dateS>0 &&_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
             //riconsegna item
-            bool l;
-            l =  Calendario.setAvailable(_id,"Waiting"); 
-            require(l == true, "Non disponibile1");
+           
             //chiamare update
+            if(Calendario.Back(_id,dateS)){
             safeTransferFrom( _from,_to, _id,1,"");
-            CautionId[_id]= _from;
+            CautionId[_id]= _from;}
             }
             else if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
               //caso in cui voglio cancellare una prenotazione
@@ -174,31 +173,30 @@ contract LoanItem is ERC1155{
             }
             else if(_from == owner/*&& Calendario.CheckAvialable()*/){
               if(pre && !(acq)){//preOrder pago la cauzione in anticipo
-
-                /*&& Calendario.Pre_Order();*/
-              safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
-              CautionId[_id]= _to;
-                return;
+                      
+                if(Calendario.Pre_Order(dateS,dateF,_id,msg.sender)) {
+                 safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
+                 CautionId[_id]= _to;
+                 return;
               }
-              if(acq && !(pre)){
+            }
+              if(acq && !(pre) &&  CautionId[_id]== msg.sender){
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
                 //e poi pagare l'oggetto 
-                if(Calendario.AcquirePre(0,_id,msg.sender)){
+                if(Calendario.AcquirePre(_id,msg.sender)){
 
-
+                   safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel,"");
                 }
                 return;
               }
 
-              //require(tokenId[_id].pricel+tokenId[_id].caution<= balanceOf(_to,tokenId[_id].Cid),"bilancio non sufficente"); 
+              //in caso di acquisto normale 
+              if(dateF>0 && acq && pre){
+              if(Calendario.Acquire(_id,msg.sender,dateF)){
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel+tokenId[_id].caution,"");  
               safeTransferFrom( _from,_to, _id,1,"");
-             
-              bool k;
-              k =  Calendario.setAvailable(_id,"Busy"); 
-              require(k == true, "Non disponibile2");
               CautionId[_id]= _to;
-            }
+            }}}
           return;
       }
   

@@ -64,16 +64,21 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
        
         aprove = await loanitem.isApprovedForAll(account[0],account[1]) 
         assert.equal(aprove,true) 
-
-        await loanitem.TrasferTest(account[0],account[1],2,0,0,{from: account[1]})
+        
+        await litemadd.Time()
+        let time = await litemadd.createtime()
+        time = time.toNumber()
+        time = time + 14400
+        await loanitem.TrasferTest(account[0],account[1],2,1,1,0,time,{from: account[1]})
        
-         await loanitem.TrasferTest(account[0],account[1],3,0,0,{from: account[1]})
+         await loanitem.TrasferTest(account[0],account[1],3,1,1,0,time,{from: account[1]})
 
         await loanitem.setApprovalForAll(account[0],true,{from: account[1]})//account [1] to account  [0] = true
          aprove = await loanitem.isApprovedForAll(account[1],account[0])
         assert.equal(aprove,true)
 
-        await loanitem.TrasferTest(account[1],account[0],2,0,0,{from: account[1]})
+        time = time - 14400
+        await loanitem.TrasferTest(account[1],account[0],2,0,0,time,0,{from: account[1]})
         
         await loanitem.setApprovalForAll(account[0],false,{from: account[1]})//account [1] to account  [0] = false
         aprove = await loanitem.isApprovedForAll(account[1],account[0])
@@ -296,7 +301,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             Ava = await calendar.Available(8)
             assert.equal(Ava,"Available")
 
-            await calendar.Pre_Order(time,timend,8)
+            await calendar.Pre_Order(time,timend,8,account[0])
 
             Ava = await calendar.Available(8)
             assert.equal(Ava,"Preordered")
@@ -354,7 +359,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             let Ava = await calendar.Available(8)
             assert.equal(Ava,"Preordered")    
 
-             await calendar.Pre_Order(time,timend,8,{from:account[1]})
+             await calendar.Pre_Order(time,timend,8,account[1])
              //ute 1 prova a prenotare un oggetto già prenotato
              set = await calendar.Preorderstart(8,date1)
              assert.equal(set,account[0]) //ute 1 non riesce a prenotare 
@@ -387,7 +392,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-            await calendar.Pre_Order(time,timend,8,{from:account[1]})
+            await calendar.Pre_Order(time,timend,8,account[1])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
             //prenotazione non riuscita 
@@ -412,7 +417,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-            await calendar.Pre_Order(time,timend,8,{from:account[1]})
+            await calendar.Pre_Order(time,timend,8,account[1])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
             //pre_ordine non riuscito
@@ -441,7 +446,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-             await calendar.Pre_Order(time,timend,8,{from:account[1]})
+             await calendar.Pre_Order(time,timend,8,account[1])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
             //pre ordine non riuscito
@@ -470,7 +475,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-             await calendar.Pre_Order(time,timend,8,{from:account[1]})
+             await calendar.Pre_Order(time,timend,8,account[1])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,"0x0000000000000000000000000000000000000000")
             //pre ordine non riuscito 
@@ -498,7 +503,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = timend - date2 + 14400
 
 
-             await calendar.Pre_Order(time,timend,8,{from:account[1]})
+             await calendar.Pre_Order(time,timend,8,account[1])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,account[1])
             //prenotazione riuscita
@@ -527,7 +532,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-               await calendar.Pre_Order(time,timend,8,{from:account[2]})
+               await calendar.Pre_Order(time,timend,8,account[2])
             set = await calendar.Preorderstart(8,date1)
             assert.equal(set,account[2])
             //pre_ordine riuscito
@@ -555,7 +560,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date2 = date2 % 14400
             date2 = timend - date2 + 14400
 
-             await calendar.Pre_Order(time,timend,8,{from:account[3]})
+             await calendar.Pre_Order(time,timend,8,account[3])
             set = await calendar.Preorderstart(8,date1)
 
              assert.equal(set,"0x0000000000000000000000000000000000000000")
@@ -601,6 +606,8 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                   //assert.equal(tester1[2].toNumber(),1637913600)
                    assert.equal(tester1[1].toNumber(),orario)
 
+
+
                    //orario = orario - 158400 + 28800
                    
                 
@@ -616,17 +623,20 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                     //provo ad acquisire l'ordine dopo aver prenotato ed nel momento in cui arriva l'ora
                     //per far funzionare il test manipolo l'ora quindi bisogna commentare Time() in AcquirePre e 
                     //togliere i commenti in timeAdd() e commentare update()
-                    /*let account = await web3.eth.getAccounts()
+                  /* let account = await web3.eth.getAccounts()
                            await calendar.Time()
                             let orario = await calendar.time()
                              //console.log("ora1  "+orario)
-                           await calendar.TimeAdd(48800)
+                           await calendar.TimeAdd(46200)
                       orario = await calendar.time()
                             //console.log("ora2  "+orario)
 
                    orario = orario.toNumber()
 
-                  
+                    //let tester1 = await calendar.preOrderOpenGet()
+                    // console.log("tester 0 :" + tester1[0])
+                    // console.log("tester 1 :" + tester1[1])
+                    // console.log("tester 2 :" + tester1[2])
 
                     orario = await calendar.Converter(orario,false)
                    
@@ -643,12 +653,77 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
               describe('Preorder with Transaction from LoanItem', async()=>{
 
                 //da implementare 
-                /*--Quando volgio prenotare da loanItem bisognerà pagare la cauzione in anticipo--- LOANITEM
-                Una volta acquisito il pre-ordine sarà uguale ad un'acquisto normale--- LOAN ITEM MA CAUZIONE UNA SOLA VOLTA
-                Sugli acquisti normali implementare le date in cui si intende tenere l'oggetto---LOANITEM
-                ----controllare con una funzione update controlla le varie scadenze sopratutto un pre-ordine non ritirato--- CALENDAR
-                prezzi in base ai giorni/slot. LOANITEM AND CALENDAR */
-                 it('',async()=>{})
+                /*
+                ---Una volta acquisito il pre-ordine sarà uguale ad un'acquisto normale--- LOAN ITEM MA CAUZIONE UNA SOLA VOLTA
+                ---Sugli acquisti normali implementare le date in cui si intende tenere l'oggetto---LOANITEM
+
+                ---Cancellazioni preOrdini
+                ---prezzi in base ai giorni/slot. LOANITEM AND CALENDAR */
+                 
+
+                //Faccio le stesse operazioni Acquire-Prenotazione tramite loanItem che 
+                //si interfaccia a calendar
+                 it('preOrder from LoanItem',async()=>{
+
+                        let result = await calendar.Available(6)
+                        assert.equal(result,"Available")
+
+                        let account = await web3.eth.getAccounts()
+                        aprove = await loanitem.isApprovedForAll(account[0],account[2])
+                        assert.equal(aprove,false)  
+                        await loanitem.setApprovalForAll(account[2],true,{from: account[0]})//account [0] to account  [1] = true
+       
+                        aprove = await loanitem.isApprovedForAll(account[0],account[2]) 
+                        assert.equal(aprove,true) 
+
+                        await litemadd.Time()
+                        let orario = await litemadd.createtime();
+                        orario = orario.toNumber()
+                        orario = orario + 28800   //per due slot + 1 standard
+
+                        await loanitem.GiveToken(account[2],1,web3.utils.toWei("1000000", 'Ether'),{from: account[0]})////100 FToken
+
+                        await loanitem.TrasferTest(account[0],account[2],6,1,0,0,orario,{from:account[2]})
+
+                        orario = orario - 28800
+                        let date2 = orario % 86400
+                        date2 = date2 % 14400
+                        date2 = orario - date2 + 14400
+
+                     
+                        let result3 = await calendar.Available(6)
+                        assert.equal(result3,"Preordered")
+                       // result3 = await calendar.Preorderstart(6,date2)
+                       // assert.equal(result3,account[2])
+
+                 })
+                         it('Acquire from LoanItem',async()=>{
+
+                            //per far fuzionare questo test commentare Update in 
+                            //acquire pre per poter manimolare il tempo
+
+                            let account = await web3.eth.getAccounts()
+                            await calendar.TimeAdd(28800)
+
+                            await loanitem.TrasferTest(account[0],account[2],6,0,1,0,0,{from:account[2]})
+
+                            let result2 = await calendar.Available(6)
+
+                            assert.equal(result2,"Busy")
+
+                            })
+                         /*
+                         it('set Waiting LoanItem fatto sopra',async()=>{
+
+                         })
+
+                         it('Normal acquisto from LoanItem fatto sopra',async()=>{
+
+
+                            })*/
+                         it('relese di oggetti prenotati con Available==preOrdered',async()=>{
+                            /**/
+                            })
 
               })
 

@@ -14,7 +14,7 @@ contract Calendar   {
     uint256 Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
 		    
-
+ 
  
 
 	constructor() public { 
@@ -32,21 +32,28 @@ contract Calendar   {
         
         time = time + i;
       }
-	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id)  external returns(bool suc) {
+	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr)  external returns(bool suc) {
+    Time();
+
+    if(dataStart==0)
+    dataStart= time ;
     suc = false;
-    time =block.timestamp-10 + fusoorario;
-    require(time < dataStart,"Not possible in the past");
+   	require(dataEnd>0,"dataEnd is 0");
+    require(time <= dataStart,"Not possible in the past");
     uint256 date1 = Converter(dataStart,true);
     uint256 date2 = Converter(dataEnd,true);
 
+
+   
 		require(date1<date2,"<");//la prenotazione vale almeno se dura 4 ore
       if(_id>Orders)
         Orders= _id;
 
         if(CheckAvialable(_id,date1,date2)){
     PreorderOpen[_id].push(date1);
-		Preorderstart[_id][date1]= msg.sender;
-		Preorderend[_id][date1]=date2;	
+		Preorderstart[_id][date1]= _usr;
+		Preorderend[_id][date1]=date2;
+		if(keccak256(bytes("Available"))==keccak256(bytes(Available[_id])))	
 		Available[_id]="Preordered";
 				suc = true;
 		}
@@ -114,6 +121,8 @@ contract Calendar   {
 				}
 			}}
 		    }
+
+
 	function setAvailable(uint256 idA,string memory Status)public returns(bool){
 	if(keccak256(bytes(Status)) == keccak256(bytes("Busy"))||keccak256(bytes(Status)) == keccak256(bytes("Available"))||keccak256(bytes(Status)) == keccak256(bytes("Waiting")) ){
 			Available[idA]=Status;
@@ -131,11 +140,29 @@ function setFusoOraio()public{
 		fusoorario=0;
 	}
 }
-function Relese(uint256 _id1) external{
-	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")));
+function Back(uint256 _id1,uint256 _dateS) external returns(bool){
+
+	_dateS = Converter(_dateS,false);
+
+
+	 if(keccak256(bytes(Available[_id1])) == keccak256(bytes("Busy"))&& _dateS>0&& Preorderend[_id1][_dateS]>0){
+
+
 	  bool k;
-          k = setAvailable(_id1,"Available"); 
-          require(k == true, "Non disponibile3");
+          k = setAvailable(_id1,"Waiting"); 
+         if(k){
+         delete	Preorderstart[_id1][_dateS];
+				 delete Preorderend[_id1][_dateS];
+				 for(uint256 i; i< PreorderOpen[_id1].length;i++){
+				 	if(PreorderOpen[_id1][i]==_dateS){
+				 		delete PreorderOpen[_id1][i];
+				 		return true;
+
+				 	}
+
+         } }
+       }
+       return false;
 }
 function Converter(uint256 date, bool next)public view virtual returns(uint256){
      uint256 lest;
@@ -151,29 +178,53 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
 }
 function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
-	Time();
-  Update();
-  	
-      
 
-  	
+  //Update();
+
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
-  		if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
-  			if( time>=PreorderOpen[idP][i] && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
-  		Available[idP]="Busy";							
-  			return true;}
+  			if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
+  				if( time>=PreorderOpen[idP][i] && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
+  				
+  				Available[idP]="Busy";							
+  				return true;}
   		}
-		}
-
-  	
+		}	
 //PreorderOpen verificare la data che ci sia come il proprietario del pre-ordine sia 
 //quello giusto
 
 	return ret;
 }
+function Acquire(uint256 idP,address usr,uint256 _dataF) public   returns(bool ret){
+ 
+
+
+ 
+ if(_dataF>time){
+         bool k;
+      k =  setAvailable(idP,"Busy"); 
+      require(k == true, "Non disponibile2");
+      uint256 dateSt;
+      Time();
+			dateSt = Converter(time,false);
+   		_dataF = Converter(_dataF,true);
+   		PreorderOpen[idP].push(dateSt);
+   		Preorderstart[idP][dateSt]= usr;
+		  Preorderend[idP][dateSt]=_dataF;
+
+      return true;
+}
+
+return false;}
+
 	
 	function preOrderOpenGet(/*uint256 i*/) external  view virtual returns(uint256[] memory){
      
   return  PreorderOpen[8];
 	}
+  function Relese(uint256 _id1) external{
+	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")));
+	  bool k;
+          k = setAvailable(_id1,"Available"); 
+          require(k == true, "Non disponibile3");
+}
 }
