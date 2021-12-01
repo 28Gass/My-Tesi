@@ -36,7 +36,7 @@ contract Calendar   {
     Time();
 
     if(dataStart==0)
-    dataStart= time ;
+    dataStart= time;
     suc = false;
    	require(dataEnd>0,"dataEnd is 0");
     require(time <= dataStart,"Not possible in the past");
@@ -75,7 +75,7 @@ contract Calendar   {
 						|| (PreorderOpen[idA][i]<= _dataEnd && _dataEnd<=Preorderend[idA][PreorderOpen[idA][i]])
 						|| (_dataStart<= PreorderOpen[idA][i] && Preorderend[idA][PreorderOpen[idA][i]]<=_dataEnd)
 						){
-						ret = false;
+						return false;
 						i = PreorderOpen[idA].length;
 					}
 
@@ -197,7 +197,7 @@ function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 function Acquire(uint256 idP,address usr,uint256 _dataF) public   returns(bool ret){
  
 
-
+//Update();
  
  if(_dataF>time){
          bool k;
@@ -222,9 +222,15 @@ return false;}
   return  PreorderOpen[8];
 	}
   function Relese(uint256 _id1) external{
+  	//Update();
+
 	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")));
 	  bool k;
-          k = setAvailable(_id1,"Available"); 
+	  if(!(CheckAvialable(_id1,time-90000,time+2592000))){//dataS -1 un giorno, dataE + 30gg 
+           k = setAvailable(_id1,"Preorderend"); 
           require(k == true, "Non disponibile3");
+          }else{
+          k = setAvailable(_id1,"Available"); 
+          require(k == true, "Non disponibile3");}
 }
 }

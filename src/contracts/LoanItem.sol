@@ -161,24 +161,25 @@ contract LoanItem is ERC1155{
           
           if(dateS>0 &&_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
             //riconsegna item
-           
-            //chiamare update
             if(Calendario.Back(_id,dateS)){
             safeTransferFrom( _from,_to, _id,1,"");
-            CautionId[_id]= _from;}
+            CautionId[_id]= _from;
+            return;
+          }
             }
             else if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
               //caso in cui voglio cancellare una prenotazione
-
+              return;
             }
             else if(_from == owner/*&& Calendario.CheckAvialable()*/){
-              if(pre && !(acq)){//preOrder pago la cauzione in anticipo
+              if(pre && !(acq) && dateF>0){//preOrder pago la cauzione in anticipo
                       
                 if(Calendario.Pre_Order(dateS,dateF,_id,msg.sender)) {
                  safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
                  CautionId[_id]= _to;
                  return;
               }
+                return;
             }
               if(acq && !(pre) &&  CautionId[_id]== msg.sender){
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
@@ -205,14 +206,14 @@ contract LoanItem is ERC1155{
         safeTransferFrom( msg.sender,_to, coin,100000000000000000000,"");
       }
 
-      function ReleseW(uint256 _id, uint256 caution )  external propriety{
+      function ReleseW(uint256 _id, uint256 _caution )  external propriety{
     //si potrebbe gestire il caso in cui la cauzione restituita sia variabile
         require(_id>0,"");
         require(_id<=countAttrezzi,"item not exists");
         require(ids[_id]>0,"Token not exists" );
        
-       Calendario.Relese(_id);
 
+       Calendario.Relese(_id);
         safeTransferFrom( msg.sender,CautionId[_id], 1, tokenId[_id].caution,"");
         CautionId[_id]= address(0x0);
          
