@@ -163,7 +163,7 @@ contract LoanItem is ERC1155{
             //riconsegna item
             if(Calendario.Back(_id,dateS)){
             safeTransferFrom( _from,_to, _id,1,"");
-            CautionId[_id].push(_from);
+            //CautionId[_id].push(_from);
             return;
           }
             }
@@ -188,8 +188,8 @@ contract LoanItem is ERC1155{
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
                 //e poi pagare l'oggetto 
                 if(Calendario.AcquirePre(_id,msg.sender)){
-
                    safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel,"");
+                   safeTransferFrom( _from,_to, _id,1,"");
                     return;
               }}}
                 
@@ -219,9 +219,9 @@ contract LoanItem is ERC1155{
 
        
        for(uint256 i; i<CautionId[_id].length;i++){
-        if(CautionId[_id][i]==_usr){
+        if(CautionId[_id][i]==_usr && _usr!=msg.sender){
+        safeTransferFrom( msg.sender,_usr, tokenId[_id].Cid, tokenId[_id].caution,"");
         Calendario.Relese(_id);
-        safeTransferFrom( msg.sender,CautionId[_id][i], 1, tokenId[_id].caution,"");
         delete CautionId[_id][i];
          return;
          }}

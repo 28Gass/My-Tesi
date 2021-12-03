@@ -131,7 +131,7 @@ contract Calendar   {
 
 
 	function setAvailable(uint256 idA,string memory Status)public returns(bool){
-	if(keccak256(bytes(Status)) == keccak256(bytes("Busy"))||keccak256(bytes(Status)) == keccak256(bytes("Available"))||keccak256(bytes(Status)) == keccak256(bytes("Waiting"))||keccak256(bytes(Status)) == keccak256(bytes("Preorderend")) ){
+	if(keccak256(bytes(Status)) == keccak256(bytes("Busy"))||keccak256(bytes(Status)) == keccak256(bytes("Available"))||keccak256(bytes(Status)) == keccak256(bytes("Waiting"))||keccak256(bytes(Status)) == keccak256(bytes("Preordered")) ){
 			Available[idA]=Status;
 			return true;
 		
@@ -151,8 +151,8 @@ function Back(uint256 _id1,uint256 _dateS) external returns(bool){
 
 	_dateS = Converter(_dateS,false);
 
-
-	 if(keccak256(bytes(Available[_id1])) == keccak256(bytes("Busy"))&& _dateS>0&& Preorderend[_id1][_dateS]>0){
+    require(Preorderend[_id1][_dateS]>0,"Errore");
+	 if(keccak256(bytes(Available[_id1])) == keccak256(bytes("Busy"))&& _dateS>0){
 
 
 	  bool k;
@@ -233,10 +233,10 @@ return false;}
   function Relese(uint256 _id1) external{
   	//Update();
 
-	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")));
+	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
 	  bool k;
 	  if(!(CheckAvialable(_id1,time-90000,time+2592000))){//dataS -1 un giorno, dataE + 30gg 
-           k = setAvailable(_id1,"Preorderend");
+           k = setAvailable(_id1,"Preordered");
           require(k == true, "Non disponibile3");
           }else{
           k = setAvailable(_id1,"Available"); 

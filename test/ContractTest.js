@@ -337,7 +337,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
             date1 = date1 % 14400
             date1 = time - date1 + 14400
 
-            console.log("data Inizio :" + date1)
+            //console.log("data Inizio :" + date1)
   
             let date2 = timend % 86400
             date2 = date2 % 14400
@@ -702,14 +702,32 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                         aprove = await loanitem.isApprovedForAll(account[0],account[2]) 
                         assert.equal(aprove,true) 
 
+                         aprove = await loanitem.isApprovedForAll(account[0],account[3])
+                        assert.equal(aprove,false)  
+                        await loanitem.setApprovalForAll(account[3],true,{from: account[0]})//account [0] to account  [1] = true
+       
+                        aprove = await loanitem.isApprovedForAll(account[0],account[3]) 
+                        assert.equal(aprove,true) 
+
+
+
+
                         await litemadd.Time()
                         let orario = await litemadd.createtime();
                         orario = orario.toNumber()
                         orario = orario + 28800   //per due slot + 1 standard
 
                         await loanitem.GiveToken(account[2],1,web3.utils.toWei("1000000", 'Ether'),{from: account[0]})////100 FToken
+                        await loanitem.GiveToken(account[3],1,web3.utils.toWei("1000000", 'Ether'),{from: account[0]})
+                        
 
                         await loanitem.TrasferTest(account[0],account[2],6,1,0,0,orario,{from:account[2]})
+
+                        orarioE = orario +86400
+                        orario = orario + 43200
+                        await loanitem.TrasferTest(account[0],account[3],6,1,0,orario,orarioE,{from:account[3]})
+
+                        orario = orario - 43200
 
                         orario = orario - 28800
                         let date2 = orario % 86400
@@ -719,8 +737,14 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                      
                         let result3 = await calendar.Available(6)
                         assert.equal(result3,"Preordered")
-                        result3 = await calendar.Preorderstart(6,date2)
-                        assert.equal(result3,account[2])
+                        //result3 = await calendar.Preorderstart(6,date2)
+                        //assert.equal(result3,account[2])
+
+                        //controllare i bilanci
+
+                        let balance = await loanitem.balanceOf(account[2],6)
+
+                             assert.equal(balance,0)
 
                  })
                          it('Acquire from LoanItem',async()=>{
@@ -728,7 +752,6 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                             //per far fuzionare questo test commentare Update in 
                             //acquire pre per poter manimolare il tempo
 
-                            
                             let account = await web3.eth.getAccounts()
                             await calendar.TimeAdd(28800)
 
@@ -737,6 +760,12 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                             let result2 = await calendar.Available(6)
 
                             assert.equal(result2,"Busy")
+
+                             let balance = await loanitem.balanceOf(account[2],6)
+
+                             assert.equal(balance,1)
+
+                            //controllare i bilanci
                             
                             })
 
@@ -746,16 +775,25 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                                 //comprende la riconsegna di un item acquisito quindi con
                                 //Avialable=Waiting riconsegna cauzione e cancellazione 
                                 //delle varie date
-                                
                                 let account = await web3.eth.getAccounts()
-                                let date   = await litemadd.createtime()
-                                date = date.toNumber()
-                                let date1 = date % 86400; //tempo mod giorni
-                                date1= date1 % 14400;  //mod 4 ore
-                                date1 = date - date1
 
-                                await loanitem.TrasferTest(account[2],account[1],6,0,0,date1,0,{from:account[2]})
-                        
+                                let wow = await calendar.PreorderOpen(6,0)
+                                //console.log("Funziona :"+wow)
+                                //console.log("Funziona1:"+date1)
+
+                                //let balance = await loanitem.balanceOf(account[2],1)
+                                //console.log("Soldi 2:"+ balance)
+                                //balance = await loanitem.balanceOf(account[3],1)
+                                //console.log("Soldi 3:"+ balance)
+                                //balance = await loanitem.balanceOf(account[0],1)
+                                //console.log("Soldi 0:"+ balance)
+
+
+                                await loanitem.TrasferTest(account[2],account[0],6,0,0,wow,0,{from:account[2]})
+                                
+                                let gava = await calendar.Available(6)
+
+                                assert.equal(gava,"Waiting")
 
 
                              })
@@ -773,8 +811,13 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                               let account = await web3.eth.getAccounts()
 
                            
-                              //await loanitem.ReleseW(6,0)
+                             await loanitem.ReleseW(6,account[2],0,{from: account[0]})
+
+                             let tester= await calendar.Available(6)
             
+                            assert.equal(tester,"Preordered")
+
+                            //controllare i bilanci
 
                             })
 
