@@ -76,15 +76,39 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
         await loanitem.setApprovalForAll(account[0],true,{from: account[1]})//account [1] to account  [0] = true
          aprove = await loanitem.isApprovedForAll(account[1],account[0])
         assert.equal(aprove,true)
+        /*
+          let arry= await calendar.preOrderOpenGet(2)
+          for(let i=0; i<arry.length;i++ ){
+                                console.log(" Arry: " + arry[i])
+                              }
+        let Start =  await calendar.Preorderstart(2,arry[0])
+        let End   =  await calendar.Preorderend(2,arry[0])
 
+        console.log("Inizio :" + Start)
+        console.log("Fine   :" + End)
+        */
         time = time - 14400
         await loanitem.TrasferTest(account[1],account[0],2,0,0,time,0,{from: account[1]})
         
         await loanitem.setApprovalForAll(account[0],false,{from: account[1]})//account [1] to account  [0] = false
         aprove = await loanitem.isApprovedForAll(account[1],account[0])
         assert.equal(aprove,false) 
-        })
-     
+        /*
+             arry= await calendar.preOrderOpenGet(2)
+          for(let i=0; i<arry.length;i++ ){
+                                console.log(" Arry: " + arry[i])
+                              }
+         Start =  await calendar.Preorderstart(2,arry[0])
+         End   =  await calendar.Preorderend(2,arry[0])
+
+        console.log("Inizio :" + Start)
+        console.log("Fine   :" + End)
+        
+        let ters = await calendar.Available(2)
+        assert.equal(ters,"Waiting")
+*/
+ })
+
     // test controllo il bilancio dopo una transazione
    it('contract test trasfer', async () => {
     	let account = await web3.eth.getAccounts()
@@ -189,7 +213,8 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
      describe('Relese Item Waiting to Available and caution', async()=>{
         it('Item 1 ',async()=>{
             let account = await web3.eth.getAccounts()
-            await loanitem.ReleseW(2,0)
+            await loanitem.ReleseW(2,account[1],0)
+
             let balnce = await loanitem.balanceOf(account[1],1)
              assert.equal(web3.utils.fromWei(balnce, 'Ether'),96.5)
              balnce = await loanitem.balanceOf(account[0],1)
@@ -225,7 +250,8 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
             let prova = await loanitem.tokenId(8)
             assert.equal(prova.namet,"Sesto Item")
           })  
-        
+          it('account[1] Try to sell this item[8] DA FARE ',async()=>{
+        })
      })
      describe('Time Test', async()=>{
          it('time ',async()=>{
@@ -688,7 +714,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                         orario = orario - 28800
                         let date2 = orario % 86400
                         date2 = date2 % 14400
-                        date2 = orario - date2 //+ 14400
+                        date2 = orario - date2 + 14400
 
                      
                         let result3 = await calendar.Available(6)
@@ -746,9 +772,9 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                             /**/
                               let account = await web3.eth.getAccounts()
 
-                              await calendar.ReleseW(6,0)
-
-                              
+                           
+                              //await loanitem.ReleseW(6,0)
+            
 
                             })
 

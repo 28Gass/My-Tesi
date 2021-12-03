@@ -18,7 +18,7 @@ contract LoanItem is ERC1155{
    
      mapping(uint => Image)public images;
      mapping(uint => TokenNFT)public tokenId;
-     mapping(uint => address)public CautionId;
+     mapping(uint256=>address[]) public CautionId;
      mapping(uint256 => uint256) public ids;
 
      mapping(address => bool) public permissions;
@@ -163,7 +163,7 @@ contract LoanItem is ERC1155{
             //riconsegna item
             if(Calendario.Back(_id,dateS)){
             safeTransferFrom( _from,_to, _id,1,"");
-            CautionId[_id]= _from;
+            CautionId[_id].push(_from);
             return;
           }
             }
@@ -176,19 +176,23 @@ contract LoanItem is ERC1155{
                       
                 if(Calendario.Pre_Order(dateS,dateF,_id,msg.sender)) {
                  safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].caution,"");
-                 CautionId[_id]= _to;
+                 CautionId[_id].push(_to);
                  return;
               }
                 return;
             }
-              if(acq && !(pre) &&  CautionId[_id]== msg.sender){
+              if(acq && !(pre)){ 
+
+                for(uint256 i; i < CautionId[_id].length;i++){
+                if(CautionId[_id][i]== msg.sender){
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
                 //e poi pagare l'oggetto 
                 if(Calendario.AcquirePre(_id,msg.sender)){
 
                    safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel,"");
-                }
-                return;
+                    return;
+              }}}
+                
               }
 
               //in caso di acquisto normale 
@@ -196,7 +200,7 @@ contract LoanItem is ERC1155{
               if(Calendario.Acquire(_id,msg.sender,dateF)){
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel+tokenId[_id].caution,"");  
               safeTransferFrom( _from,_to, _id,1,"");
-              CautionId[_id]= _to;
+              CautionId[_id].push(_to);
             }}}
           return;
       }
@@ -206,17 +210,21 @@ contract LoanItem is ERC1155{
         safeTransferFrom( msg.sender,_to, coin,100000000000000000000,"");
       }
 
-      function ReleseW(uint256 _id, uint256 _caution )  external propriety{
+      function ReleseW(uint256 _id,address _usr, uint256 _caution )  external propriety{
     //si potrebbe gestire il caso in cui la cauzione restituita sia variabile
         require(_id>0,"");
         require(_id<=countAttrezzi,"item not exists");
         require(ids[_id]>0,"Token not exists" );
        
 
-       Calendario.Relese(_id);
-        safeTransferFrom( msg.sender,CautionId[_id], 1, tokenId[_id].caution,"");
-        CautionId[_id]= address(0x0);
-         
+       
+       for(uint256 i; i<CautionId[_id].length;i++){
+        if(CautionId[_id][i]==_usr){
+        Calendario.Relese(_id);
+        safeTransferFrom( msg.sender,CautionId[_id][i], 1, tokenId[_id].caution,"");
+        delete CautionId[_id][i];
+         return;
+         }}
          
       }
     
