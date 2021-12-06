@@ -236,22 +236,85 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
          })
           it('account[1] create new Coin ',async()=>{
             let account = await web3.eth.getAccounts()
-            await loanitem.addNewCoin(web3.utils.toWei("100000", 'Ether'),"PippoCoin","Best Coin",{from: account[1]})
+            await loanitem.addNewCoin(web3.utils.toWei("1000000", 'Ether'),"PippoCoin","Best Coin",{from: account[1]})
             let name = await loanitem.CoinId(7)
             assert.equal(name.namec,"PippoCoin")
             let balance = await loanitem.balanceOf(account[1],7)
-            assert.equal(web3.utils.fromWei(balance, 'Ether'),100000)
+            assert.equal(web3.utils.fromWei(balance, 'Ether'),1000000)
          })                           
           it('account[1] create new Item ',async()=>{
              let account = await web3.eth.getAccounts()
-            await loanitem.addNewItem(web3.utils.toWei("6", 'Ether'),web3.utils.toWei("0.6", 'Ether'),"1236","3att","Sesto Item",1,{from: account[1]})/*,*/
+            await loanitem.addNewItem(web3.utils.toWei("6", 'Ether'),web3.utils.toWei("0.6", 'Ether'),"1236","3att","Sesto Item",7,{from: account[1]})/*,*/
             let balance = await loanitem.balanceOf(account[1],8)
             assert.equal(balance,1)
             let prova = await loanitem.tokenId(8)
             assert.equal(prova.namet,"Sesto Item")
+            assert.equal(prova.own,account[1])
           })  
           it('account[1] Try to sell this item[8] DA FARE ',async()=>{
+             let account = await web3.eth.getAccounts()
+            await loanitem.GiveToken(account[4],7,web3.utils.toWei("1000000", 'Ether'),{from: account[1]})
+            let balance = await loanitem.balanceOf(account[4],7)
+            assert.equal(web3.utils.fromWei(balance, 'Ether'),100)
+
+            await litemadd.Time()
+            let time = await litemadd.createtime()
+            time = time.toNumber()
+            let timef = time +28800  
+
+            await loanitem.setApprovalForAll(account[4],true,{from: account[0]})//account [0] to account  [1] = true
+            let aprove = await loanitem.isApprovedForAll(account[0],account[4]) 
+            assert.equal(aprove,true)
+
+           //  await loanitem.setApprovalForAll(account[1],true,{from: account[4]})//account [0] to account  [1] = true
+           //  aprove = await loanitem.isApprovedForAll(account[4],account[1]) 
+           // assert.equal(aprove,true)
+
+             await loanitem.setApprovalForAll(account[4],true,{from: account[1]})//account [0] to account  [1] = true
+             aprove = await loanitem.isApprovedForAll(account[1],account[4]) 
+            assert.equal(aprove,true)
+
+
+            await loanitem.TrasferTest(account[1],account[4],8,1,1,time,timef,{from:account[4]})
+
+            let vers = await loanitem.balanceOf(account[4],8)
+            assert.equal(vers,1)
+            let stat = await calendar.Available(8)
+            assert.equal(stat,"Busy")
+
+            balance = await loanitem.balanceOf(account[4],7)
+            assert.equal(web3.utils.fromWei(balance, 'Ether'),93.4)
+
+
+
+            await loanitem.TrasferTest(account[4],account[1],8,0,0,time,timef,{from:account[4]})
+
+            stat = await calendar.Available(8)
+            assert.equal(stat,"Waiting")
+
+            await loanitem.ReleseW(8,account[4],0,{from:account[1]})
+            stat = await calendar.Available(8)
+            assert.equal(stat,"Available")
+
+                    /*
+             let account = await web3.eth.getAccounts()
+                        aprove = await loanitem.isApprovedForAll(account[0],account[2])
+                        assert.equal(aprove,false)  
+                        await loanitem.setApprovalForAll(account[2],true,{from: account[0]})//account [0] to account  [1] = true
+       
+                        aprove = await loanitem.isApprovedForAll(account[0],account[2]) 
+                        assert.equal(aprove,true) 
+
+                         aprove = await loanitem.isApprovedForAll(account[0],account[3])
+                        assert.equal(aprove,false)  
+                        await loanitem.setApprovalForAll(account[3],true,{from: account[0]})//account [0] to account  [1] = true
+       
+                        aprove = await loanitem.isApprovedForAll(account[0],account[3]) 
+                        assert.equal(aprove,true) */
+
+
         })
+          
      })
      describe('Time Test', async()=>{
          it('time ',async()=>{
@@ -816,6 +879,8 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                              let tester= await calendar.Available(6)
             
                             assert.equal(tester,"Preordered")
+
+                       
 
                             //controllare i bilanci
 

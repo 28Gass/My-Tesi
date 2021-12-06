@@ -52,6 +52,8 @@ contract LoanItem is ERC1155{
       uint256 pricel;
       uint256 caution;
       uint256 Cid;
+      address own;
+      
       
     }
     event TokenNFTCreated(
@@ -144,7 +146,7 @@ contract LoanItem is ERC1155{
   
   
         images[imageCount] = Image(imageCount,_imgHash,_description,0,owner);
-        tokenId[countAttrezzi] = TokenNFT(countAttrezzi,images[imageCount],_description,namef,price,caution,Cid);
+        tokenId[countAttrezzi] = TokenNFT(countAttrezzi,images[imageCount],_description,namef,price,caution,Cid,msg.sender);
         //causa l'evento 
         emit ImageCreated(imageCount,_imgHash,_description,0,owner);
         emit TokenNFTCreated(countAttrezzi,images[imageCount],_description,namef,price,caution,Cid);    
@@ -159,7 +161,8 @@ contract LoanItem is ERC1155{
           require(keccak256(bytes(tokenId[_id].namet))> 0, "token not true");  
           require(keccak256(bytes(Calendario.Available(_id))) != keccak256(bytes("Waiting")),"token is waiting ");
           
-          if(dateS>0 &&_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
+          //fare che pre end acq devono essere entrambi falsi
+          if(dateS>0 &&_to == tokenId[_id].own &&!(acq) && !(pre)   && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Busy"))){
             //riconsegna item
             if(Calendario.Back(_id,dateS)){
             safeTransferFrom( _from,_to, _id,1,"");
@@ -167,11 +170,11 @@ contract LoanItem is ERC1155{
             return;
           }
             }
-            else if(_to == owner  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
+            else if(_to == tokenId[_id].own  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
               //caso in cui voglio cancellare una prenotazione
               return;
             }
-            else if(_from == owner/*&& Calendario.CheckAvialable()*/){
+            else if(_from == tokenId[_id].own/*&& Calendario.CheckAvialable()*/){
               if(pre && !(acq) && dateF>0){//preOrder pago la cauzione in anticipo
                       
                 if(Calendario.Pre_Order(dateS,dateF,_id,msg.sender)) {
@@ -187,7 +190,7 @@ contract LoanItem is ERC1155{
                 if(CautionId[_id][i]== msg.sender){
                 //per fare l'acquire di un oggetto prenotato devo verificare la data inizio
                 //e poi pagare l'oggetto 
-                if(Calendario.AcquirePre(_id,msg.sender)){
+                if(Calendario.AcquirePre(_id,msg.sender) && _from==tokenId[_id].own){
                    safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel,"");
                    safeTransferFrom( _from,_to, _id,1,"");
                     return;
@@ -196,7 +199,7 @@ contract LoanItem is ERC1155{
               }
 
               //in caso di acquisto normale 
-              if(dateF>0 && acq && pre){
+              if(dateF>0 && acq && pre && _from== tokenId[_id].own){
               if(Calendario.Acquire(_id,msg.sender,dateF)){
               safeTransferFrom( _to,_from,tokenId[_id].Cid,tokenId[_id].pricel+tokenId[_id].caution,"");  
               safeTransferFrom( _from,_to, _id,1,"");
@@ -207,6 +210,7 @@ contract LoanItem is ERC1155{
   
       
       function GiveToken(address _to,uint256 coin,uint256 value) external propriety {
+        
         safeTransferFrom( msg.sender,_to, coin,100000000000000000000,"");
       }
 
