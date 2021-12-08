@@ -17,9 +17,10 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
     calendar= await  LItemCalendar.new()
     loanitem = await LoanItem.new(account[0],calendar.address)
     litemadd = await LItemUtils.new(loanitem.address,calendar.address)
-    
+
+
    
-   await loanitem.addNewCoin(web3.utils.toWei("1000000", 'Ether'),"FToken","best Token",{from: account[0]});
+    await loanitem.addNewCoin(web3.utils.toWei("1000000", 'Ether'),"FToken","best Token",{from: account[0]});
 
     await loanitem.addNewItem(web3.utils.toWei("1", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1233","5att","Primo Item",1)/*,*/
     await loanitem.addNewItem(web3.utils.toWei("2", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1234","4att","Secondo Item",1)/*,*/
@@ -814,7 +815,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
 
                             //per far fuzionare questo test commentare Update in 
                             //acquire pre per poter manimolare il tempo
-
+                            /*
                             let account = await web3.eth.getAccounts()
                             await calendar.TimeAdd(28800)
 
@@ -826,7 +827,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
 
                              let balance = await loanitem.balanceOf(account[2],6)
 
-                             assert.equal(balance,1)
+                             assert.equal(balance,1)*/
 
                             //controllare i bilanci
                             
@@ -838,9 +839,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                                 //comprende la riconsegna di un item acquisito quindi con
                                 //Avialable=Waiting riconsegna cauzione e cancellazione 
                                 //delle varie date
-                                let account = await web3.eth.getAccounts()
-
-                                let wow = await calendar.PreorderOpen(6,0)
+                              
                                 //console.log("Funziona :"+wow)
                                 //console.log("Funziona1:"+date1)
 
@@ -850,13 +849,16 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
                                 //console.log("Soldi 3:"+ balance)
                                 //balance = await loanitem.balanceOf(account[0],1)
                                 //console.log("Soldi 0:"+ balance)
+                                /*
+                                let account = await web3.eth.getAccounts()
 
+                                let wow = await calendar.PreorderOpen(6,0)
 
                                 await loanitem.TrasferTest(account[2],account[0],6,0,0,wow,0,{from:account[2]})
                                 
                                 let gava = await calendar.Available(6)
 
-                                assert.equal(gava,"Waiting")
+                                assert.equal(gava,"Waiting")*/
 
 
                              })
@@ -870,7 +872,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
 
                             })*/
                          it('relese di oggetti prenotati da Waiting->Available->preOrdered',async()=>{
-                            /**/
+                            /*
                               let account = await web3.eth.getAccounts()
 
                            
@@ -878,7 +880,7 @@ describe('TEST PRE-ORDINI Calendar', async()=>{
 
                              let tester= await calendar.Available(6)
             
-                            assert.equal(tester,"Preordered")
+                            assert.equal(tester,"Preordered")*/
 
                        
 

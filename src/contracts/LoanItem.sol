@@ -170,10 +170,10 @@ contract LoanItem is ERC1155{
             return;
           }
             }
-            else if(_to == tokenId[_id].own  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
+            /*else if(_to == tokenId[_id].own  && keccak256(bytes(Calendario.Available(_id))) == keccak256(bytes("Preordered"))){
               //caso in cui voglio cancellare una prenotazione
               return;
-            }
+            }*/
             else if(_from == tokenId[_id].own/*&& Calendario.CheckAvialable()*/){
               if(pre && !(acq) && dateF>0){//preOrder pago la cauzione in anticipo
                       
@@ -231,8 +231,19 @@ contract LoanItem is ERC1155{
          }}
          
       }
-    
+      /*
+    function WaitingUsr(uint256 _id) public returns(address){
    
+   for(uint256 i; i<Calendario.Orders();i++){
+    if(CautionId[_id][i] != address(0x0)){
+      i = Calendario.Orders();
+      return CautionId[_id][i];
+
+   }
+
+    }
+   return address(0x0);
+    }*/
     }
 
 

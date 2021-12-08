@@ -17,6 +17,8 @@ import"./LitemCalendar.sol";
    LoanItem loanItem;
    Calendar Calendario;
    uint256 fusoorario;
+   
+   
 
   constructor(LoanItem LItem,Calendar calendario) public {  
   owner = msg.sender;
@@ -68,7 +70,20 @@ import"./LitemCalendar.sol";
         }  
         return batchBalances1;
       }
-      
+      /*
+        function AllWaiting() external
+      virtual
+      returns (bool ret)
+      {   
+           ret = true;
+          if(keccak256(bytes(Calendario.Available(i)))==keccak256(bytes("Waiting"))){
+  
+           
+          }
+        
+      return 1;
+      }*/
+
 
 }
 

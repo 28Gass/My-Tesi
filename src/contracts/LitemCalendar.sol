@@ -11,7 +11,7 @@ contract Calendar   {
     uint256 public time;
     uint256 fusoorario;
     uint256[] Status;
-    uint256 Orders;
+    uint256 public Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
 		    
 
@@ -188,7 +188,7 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
 function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
 
-  //Update();
+  Update();
 
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
   			if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
@@ -206,7 +206,7 @@ function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 function Acquire(uint256 idP,address usr,uint256 _dataF) public   returns(bool ret){
  
 
-//Update();
+Update();
  
  if(_dataF>time){
          bool k;
@@ -231,7 +231,7 @@ return false;}
   return  PreorderOpen[i];
 	}
   function Relese(uint256 _id1) external{
-  	//Update();
+  	Update();
 
 	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
 	  bool k;
