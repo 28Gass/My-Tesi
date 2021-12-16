@@ -33,11 +33,14 @@ console.log(litemcalend.address)*/
    
     }
  }   
-/*  
+  //let caution = await litemutils.WaitingUsr(k)
+  //console.log("hELLO: " + caution)
+
+/*
 let k=0
 let jh = await litemcalend.Orders()
  for(;k < g; k++ ){
-    let caution = await loanitem.WaitingUsr(k)
+    let caution = await litemutils.WaitingUsr(k)
       if(caution!="0x0000000000000000000000000000000000000000") {
         await loanitem.ReleseW(k,caution,0)
       }

@@ -17,7 +17,7 @@ module.exports = async function(deployer,network, accounts) {
   await deployer.deploy(LoanItem,accounts[0],litemcalend.address);
   const loanitem = await LoanItem.deployed();
   
-  await deployer.deploy(LItemUtils,loanitem.address,litemcalend.address);
+  await deployer.deploy();
   const litemadd = await LItemUtils.deployed()
 
   /*

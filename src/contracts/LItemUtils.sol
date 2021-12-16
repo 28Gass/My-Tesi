@@ -20,10 +20,8 @@ import"./LitemCalendar.sol";
    
    
 
-  constructor(LoanItem LItem,Calendar calendario) public {  
-  owner = msg.sender;
-  loanItem = LItem;
-  Calendario = calendario;
+  constructor() public {  
+  
          }
 
    function Time() external {
@@ -42,6 +40,11 @@ import"./LitemCalendar.sol";
     fusoorario=0;
   }
 }
+      function Declarence(address cal, address item) public{
+
+        loanItem = LoanItem(address(item));
+        Calendario = Calendar(address(cal));
+      }
 
         function AllBalanceBath(address[] memory _from) external
       //tutti i comodati affidati divisi per utenti _from[1] utente 1 ha ids[0] 
@@ -49,6 +52,7 @@ import"./LitemCalendar.sol";
       virtual
       returns (uint256[] memory)
       {
+         
         uint256[] memory batchBalances = new uint256[](_from.length);
         for (uint256 i = 0; i < _from.length; ++i) {
           for(uint256 j = 1; j <loanItem.countAttrezzi()+1;++j){
@@ -64,25 +68,27 @@ import"./LitemCalendar.sol";
       virtual
       returns (uint256)
       {
+        
         uint256 batchBalances1;        
         for(uint256 j = 1; j <loanItem.countAttrezzi()+1;++j){
           batchBalances1 = batchBalances1 + loanItem.balanceOf(_from,loanItem.ids(j));     
         }  
         return batchBalances1;
       }
-      /*
-        function AllWaiting() external
-      virtual
-      returns (bool ret)
-      {   
-           ret = true;
-          if(keccak256(bytes(Calendario.Available(i)))==keccak256(bytes("Waiting"))){
-  
-           
-          }
-        
-      return 1;
-      }*/
+      
+       function WaitingUsr(uint256 _id) public 
+      virtual returns(address){
+
+   for(uint256 i; i<100 + Calendario.Orders();i++){
+    if(loanItem.CautionId(_id,i) != address(0x0)){
+      i = Calendario.Orders();
+      return loanItem.CautionId(_id,i);
+
+   }
+
+    }
+   return address(0x0);
+    }
 
 
 }

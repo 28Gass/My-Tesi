@@ -16,7 +16,7 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
  	let account = await web3.eth.getAccounts()
     calendar= await  LItemCalendar.new()
     loanitem = await LoanItem.new(account[0],calendar.address)
-    litemadd = await LItemUtils.new(loanitem.address,calendar.address)
+    litemadd = await LItemUtils.new()
 
 
    
@@ -292,6 +292,9 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
 
             stat = await calendar.Available(8)
             assert.equal(stat,"Waiting")
+
+            let users =  await litemadd.WaitingUsr(8)
+            console.log("Utente in attesa :" + users)
 
             await loanitem.ReleseW(8,account[4],0,{from:account[1]})
             stat = await calendar.Available(8)
