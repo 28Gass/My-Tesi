@@ -30,8 +30,6 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
 
     
     await loanitem.GiveToken(account[1],1,web3.utils.toWei("1000000", 'Ether'),{from: account[0]})////100 FToken
-
-    await litemadd.Declarence(calendar.address,loanitem.address)
     })
     //test contratto caricato con successo  
     it('has a name', async () => {
