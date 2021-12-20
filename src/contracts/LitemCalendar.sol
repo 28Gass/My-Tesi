@@ -31,7 +31,7 @@ contract Calendar   {
         time = time + i;
       }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr)  external returns(bool suc) {
-    //Time();
+    Time();
 
     if(dataStart==0)
     dataStart= time;
@@ -185,7 +185,7 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
 function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
 
-  //Update();
+  Update();
 
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
   			if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
