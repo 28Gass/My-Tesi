@@ -14,18 +14,15 @@ contract Calendar   {
     uint256 public Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
 		    
-
-
- 
-
 	constructor() public { 
       
 
 
 
 	}
-  	function Time() public {
+  	function Time() public returns(uint256) {
         time = block.timestamp+ fusoorario;
+        return time;
       }
 	/*Funzione per testare le scadenze in update*/
    
@@ -34,7 +31,7 @@ contract Calendar   {
         time = time + i;
       }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr)  external returns(bool suc) {
-    Time();
+    //Time();
 
     if(dataStart==0)
     dataStart= time;
@@ -188,12 +185,11 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
 function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
 	ret = false;
 
-  Update();
+  //Update();
 
   		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
   			if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
   				if( time>=PreorderOpen[idP][i] && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
-  				
   				Available[idP]="Busy";							
   				return true;}
   		}

@@ -13,3 +13,17 @@ https://github.com/dappuniversity/nft/blob/master/src/contracts/Color.sol
 
 
 https://github.com/28Gass/My-Tesi/settings/access
+
+
+--------------------------------------------------------
+
+https://docs.openzeppelin.com/contracts/2.x/api/token/erc721#ERC721Mintable
+
+https://soliditydeveloper.com/erc-721
+https://www.quicknode.com/guides/solidity/how-to-create-and-deploy-an-erc-721-nftù
+
+
+commonshood
+https://github.com/SocialComputingGroup/commonshood-contracts/blob/master/contracts/TokenFactory.sol
+
+https://github.com/SocialComputingGroup/commonshood-contracts/blob/master/contracts/TokenTemplate.sol

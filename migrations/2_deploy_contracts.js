@@ -1,5 +1,5 @@
 
-
+const ItemFarm = artifacts.require("ItemFarm");
 const LItemUtils = artifacts.require("LItemUtils");
 const LoanItem = artifacts.require("LoanItem")
 const LItemCalendar = artifacts.require("Calendar");
@@ -14,6 +14,13 @@ module.exports = async function(deployer,network, accounts) {
 
   let account = await web3.eth.getAccounts();
 
+
+
+  await deployer.deploy(ItemFarm);
+  const itemfarm = await ItemFarm.deployed();
+
+
+
   await deployer.deploy(LoanItem,accounts[0],litemcalend.address);
   const loanitem = await LoanItem.deployed();
   
@@ -27,14 +34,14 @@ module.exports = async function(deployer,network, accounts) {
 
   //------------------------------------------------------------------------//
 
-
+/*
 
     await loanitem.addNewCoin(web3.utils.toWei("1000000", 'Ether'),"FToken","best Token",{from: account[0]});
-    await loanitem.addNewItem(web3.utils.toWei("1", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1233","5att","Primo Item",1)/*,*/
-    await loanitem.addNewItem(web3.utils.toWei("2", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1234","4att","Secondo Item",1)/*,*/
-    await loanitem.addNewItem(web3.utils.toWei("3", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1235","3att","terzo Item",1)/*,""*/
-    await loanitem.addNewItem(web3.utils.toWei("4", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1236","2att","Quarto Item",1)/*,""*/
-    await loanitem.addNewItem(web3.utils.toWei("5", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1237","1att","Quinto Item",1)/*,*/
+    await loanitem.addNewItem(web3.utils.toWei("1", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1233","5att","Primo Item",1)
+    await loanitem.addNewItem(web3.utils.toWei("2", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1234","4att","Secondo Item",1)
+    await loanitem.addNewItem(web3.utils.toWei("3", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1235","3att","terzo Item",1)
+    await loanitem.addNewItem(web3.utils.toWei("4", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1236","2att","Quarto Item",1)
+    await loanitem.addNewItem(web3.utils.toWei("5", 'Ether'),web3.utils.toWei("0.5", 'Ether'),"1237","1att","Quinto Item",1)
 
     
     await loanitem.GiveToken(account[1],1,web3.utils.toWei("1000000", 'Ether'),{from: account[0]})////100 FToken
@@ -53,7 +60,7 @@ module.exports = async function(deployer,network, accounts) {
      await loanitem.TrasferTest(account[1],account[0],2,0,0,time,0,{from: account[1]})
 
      await loanitem.setApprovalForAll(account[0],false,{from: account[1]})
-
+*/
 
      //await litemadd.AllWaiting()
 
