@@ -75,7 +75,14 @@ contract ItemFarm {
     function getAllTokenAddresses() public view returns(address[] memory){
         return ItemCreatedAddresses;
     }
-    
+      function Urltest(address Nft) public view returns(string memory){
+        
+        ItemTemplate rick;
+        rick = ItemTemplate(Nft);
+
+        return rick.UrlT() ;
+    }
+
  
 
 

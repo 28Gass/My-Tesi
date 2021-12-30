@@ -22,6 +22,8 @@ contract LoanItem {
 
 
      mapping(address =>LItem[]) public UserLoaningItem;
+     //mapping(uint256=>LItem) public LoaningItem;
+     
      mapping(address=>bool) public LoanItem;
 
      mapping(uint256=>PreItem)public PreLItem;
@@ -159,7 +161,8 @@ contract LoanItem {
       LItem memory Temp = LItem(ItemtoLoan,itemaddr,CoinId,Price,caution,PLace);
       UserLoaningItem[msg.sender].push(Temp);
       countitem++;
-      
+      // LoaningItem.push(temp)
+      //implementare la cancellazione nella relese
       LoanItem[itemaddr]=true;
       Calendario.setAvailable(ItemtoLoan._id(),"Available");
       emit LoanCreated(ItemtoLoan,itemaddr,0,Price,caution,PLace,Calendario.Time());
@@ -249,6 +252,7 @@ contract LoanItem {
           for(uint256 k; k < UserLoaningItem[_usr].length;k++){
             if(UserLoaningItem[_id][k].addr==_id){
               delete UserLoaningItem[_id][k];
+              //implementare la cancellazione LoaningItem
               return;
             }
 

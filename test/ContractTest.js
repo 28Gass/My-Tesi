@@ -46,7 +46,7 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
        assert.equal(Name,"Primo Item")
        assert.equal(Description,"5att")        
        assert.equal(Image,"1233")
-       assert.equal(Url,"")
+       assert.equal(Url,"data:application/json;base64,eyJuYW1lIjpQcmltbyBJdGVtIiwiZGVzY3JpcHRpb24iOjVhdHQiLCJJbWFnZSI6MTIzMyIsImlkIjoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASIsIk93bmVyIjox0Z5+ApYWMWHpLv/UbrjbbZm83SIsfSw=/1G64222ZvN0iLH0=")
        assert.equal(owner, account[0])
                })
       it('Add and Sell', async () => {
@@ -115,6 +115,9 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
        // assert.equal(jkl,account[3])
 
         
+        let tesf = await itemfarm.Urltest(NFT[3])
+
+        console.log("Ciao Gesù "+ tesf)
 
          
 
