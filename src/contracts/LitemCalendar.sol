@@ -13,7 +13,7 @@ contract Calendar   {
     uint256[] Status;
     uint256 public Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
-		    
+  
 	constructor() public { 
       
 
@@ -31,10 +31,11 @@ contract Calendar   {
         time = time + i;
       }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr)  external returns(bool suc) {
-    Time();
+  //  Time();
 
-    if(dataStart==0)
+    if(dataStart==0){
     dataStart= time;
+  	}
     suc = false;
    	require(dataEnd>0,"dataEnd is 0");
     require(time <= dataStart,"Not possible in the past");
@@ -107,7 +108,7 @@ contract Calendar   {
 		//controllo che i preOrdini aperti siano scaduti
 		//se si li cancello e li metto in waiting in attesa che
 		//la cauzione venga restituita
-		Time();
+	//	Time();
 		for(uint256 i; i<= Orders; i++){
 		    if(keccak256(bytes(Available[i])) == keccak256(bytes("Preordered"))){
 		    	for(uint256 j;j < PreorderOpen[i].length; j++){
@@ -226,7 +227,7 @@ return false;}
   return  PreorderOpen[i];
 	}
   function Relese(uint256 _id1) external{
-  	Update();
+  	//Update();
 
 	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
 	  bool k;

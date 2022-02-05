@@ -1,8 +1,10 @@
 
 const ItemFarm = artifacts.require("ItemFarm");
+const TokenFactory = artifacts.require("TokenFactory")
 const LItemUtils = artifacts.require("LItemUtils");
 const LoanItem = artifacts.require("LoanItem")
 const LItemCalendar = artifacts.require("Calendar");
+
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) // leaving out the arguments will default to these values
 
@@ -15,13 +17,13 @@ module.exports = async function(deployer,network, accounts) {
   let account = await web3.eth.getAccounts();
 
 
-
   await deployer.deploy(ItemFarm);
   const itemfarm = await ItemFarm.deployed();
 
+  await deployer.deploy(TokenFactory);
+  const tokenfactory = await TokenFactory.deployed();
 
-
-  await deployer.deploy(LoanItem,accounts[0],litemcalend.address);
+  await deployer.deploy(LoanItem,accounts[0],litemcalend.address,itemfarm.address);
   const loanitem = await LoanItem.deployed();
   
   await deployer.deploy(LItemUtils);

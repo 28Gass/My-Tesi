@@ -207,7 +207,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
                   '"Description":"',_description,'",',
                   '"Image":"',_imagehash,'",',
                   '"Id":"',uint2str(_id),'"',
-                
                   '}]}'
 
                        

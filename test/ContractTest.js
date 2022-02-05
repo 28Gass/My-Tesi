@@ -3,6 +3,7 @@ const LoanItem = artifacts.require("LoanItem");
 const LItemUtils = artifacts.require("LItemUtils");
 const LItemCalendar = artifacts.require("Calendar");
 const TokenTemplate = artifacts.require("ItemTemplate")
+const TokenFactory = artifacts.require("TokenFactory")
 const Itemfarm = artifacts.require("ItemFarm");
 
 contract('ItemFarm', (owner) => {
@@ -11,15 +12,19 @@ contract('ItemFarm', (owner) => {
  let aprove
  let calendar
  let itemfarm
+ let tkfactory
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) // leaving out the arguments will default to these va
  	before(async()=> {
  	//LOAD Contracts
- 	let account = await web3.eth.getAccounts()
+ 	
+    let account = await web3.eth.getAccounts()
     calendar= await  LItemCalendar.new()
-    loanitem = await LoanItem.new(account[0],calendar.address)
-    litemadd = await LItemUtils.new()
+    tkfactory = await TokenFactory.new()
     
+    loanitem = await LoanItem.new(account[0],calendar.address,tkfactory.address)
+    
+    litemadd = await LItemUtils.new()
     itemfarm = await Itemfarm.new()
 
    
@@ -32,6 +37,22 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
     await itemfarm.addNewItem("1237","1att","Quinto Item",account[2],"")
    
     })
+          it('Add Coin  ', async () => {
+         let account = await web3.eth.getAccounts()   
+         await tkfactory.createToken("Pippo Coin","PC",18,"URL","IMG",web3.utils.toWei("1000000", 'Ether'),"contract hash",{from: account[1]})
+
+         let pippocoin = await tkfactory.getToken("PC")
+
+         assert.equal(account[1],pippocoin[5])
+         
+         await tkfactory.createToken("Sommo Coin","SC",18,"URL","IMG",web3.utils.toWei("1000000", 'Ether'),"contract hash",{from: account[3]})      
+
+        })
+
+
+
+
+
     describe('Erc721 ', async()=>{
       it('has created', async () => {
         let account = await web3.eth.getAccounts()
@@ -46,27 +67,25 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
        assert.equal(Name,"Primo Item")
        assert.equal(Description,"5att")        
        assert.equal(Image,"1233")
-       assert.equal(Url,"data:application/json;base64,eyJuYW1lIjpQcmltbyBJdGVtIiwiZGVzY3JpcHRpb24iOjVhdHQiLCJJbWFnZSI6MTIzMyIsImlkIjoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASIsIk93bmVyIjox0Z5+ApYWMWHpLv/UbrjbbZm83SIsfSw=/1G64222ZvN0iLH0=")
+       assert.equal(Url,"data:application/json;base64,eyJQcmltbyBJdGVtIjpbeyJOYW1lIjoiUHJpbW8gSXRlbSIsIkRlc2NyaXB0aW9uIjoiNWF0dCIsIkltYWdlIjoiMTIzMyIsIklkIjoiMSJ9XX0=")
        assert.equal(owner, account[0])
                })
+     
       it('Add and Sell', async () => {
         let account = await web3.eth.getAccounts()
         let NFT = await itemfarm.getAllTokenAddresses()
 
-        let tester = await loanitem.SellItem(NFT[0])
-        assert.equal(tester,false)
+        await loanitem.AddToLoanOrSellItem(NFT[0],"PC",web3.utils.toWei("0.5", 'Ether'),0,"Casa mia","SellIt")
         
         const Result = await itemfarm.getItemByID(1)
         let {0: Name, 1: Description, 2: Image, 3: Url }  = Result 
         let owner = await itemfarm.getOwnerById(1)
         assert.equal(owner,account[0])
 
-        await loanitem.AddToSellItem(NFT[0],5,"Casa Mia",{from: account[0]})
-
-        tester = await loanitem.SellItem(NFT[0])
-        assert.equal(tester,true)
+        tester = await loanitem.StatusItem(NFT[0])
+        assert.equal(tester,"Selling")
         
-        await loanitem.SellIt(NFT[0],account[1])
+        await loanitem.TrasferTest(account[0],account[1],NFT[0],"Sell",0,0)
 
        const Result2 = await itemfarm.getItemByID(1)
         let {0: Name2, 1: Description2, 2: Image2, 3: Url2 }  = Result
@@ -74,8 +93,8 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
         owner = await itemfarm.getOwnerById(1)
         assert.equal(owner,account[1])
 
-        tester = await loanitem.SellItem(NFT[0])
-        assert.equal(tester,false)
+        tester = await loanitem.StatusItem(NFT[0])
+        assert.equal(tester,"")
 
     
 })
@@ -85,14 +104,16 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
 
 
 
-        await loanitem.AddToLoanItem(NFT[3],5,2,0,"Casa Mia",{from: account[2]})
+        await loanitem.AddToLoanOrSellItem(NFT[3],"SC",web3.utils.toWei("0.5", 'Ether'),web3.utils.toWei("0.5", 'Ether'),
+                                            "Casa Mia","LoanItem",{from: account[2]})
 
-        let result = await loanitem.LoanItem(NFT[3])
-        assert.equal(result,true)
+        let result = await loanitem.StatusItem(NFT[3])
+        assert.equal(result,"LoaningItem")
 
         result = await calendar.Available(4)
         assert.equal(result,"Available")
       })
+
        it('Pre-LoanItem ', async () => {
         let account = await web3.eth.getAccounts()
         let NFT = await itemfarm.getAllTokenAddresses()
@@ -104,10 +125,14 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
             time = time.toNumber()
             time = time + 28800         
 
-        await loanitem.TrasferTest(account[2],account[3],NFT[3],true,false,time,timend,0,{from:account[3]})
+        await loanitem.TrasferTest(account[2],account[3],NFT[3],"Prenotazione",time,timend,{from:account[3]})
 
         let result = await calendar.Available(4)
         assert.equal(result,"Preordered")
+        
+        //let improve = await calendar.Converter(time,true)
+        
+        
 
         let jkl = await loanitem.CautionId(4,0)
         assert.equal(jkl,account[3])
@@ -116,51 +141,54 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
 
         
         let tesf = await itemfarm.Urltest(NFT[3])
-
-        console.log("Ciao Gesù "+ tesf)
-
-         
-
+       // console.log(tesf)
 
        })
+
+  
+
+
+
    it('Acquire-LoanItem ', async () => {
           //provo ad acquisire l'ordine dopo aver prenotato ed nel momento in cui arriva l'ora
           //per far funzionare il test manipolo l'ora quindi bisogna commentare Time() in AcquirePre e 
           //togliere i commenti in timeAdd() e commentare update()
 
-          /*     let account = await web3.eth.getAccounts()
+              let account = await web3.eth.getAccounts()
           let NFT = await itemfarm.getAllTokenAddresses()          
 
           await calendar.TimeAdd(50000)
 
-          await loanitem.TrasferTest(account[2],account[3],NFT[3],false,true,0,0,1,{from:account[3]})
+          await loanitem.TrasferTest(account[2],account[3],NFT[3],"RitiroPre",0,0,{from:account[3]})
 
           let result = await calendar.Available(4)
-          assert.equal(result,"Busy")*/
+          assert.equal(result,"Busy")
 
       
         })
         it('Back-LoanItem ', async () => {
-       /*   let account = await web3.eth.getAccounts()
+        let account = await web3.eth.getAccounts()
           let NFT = await itemfarm.getAllTokenAddresses() 
           
           let time = await calendar.time()
           time  = time.toNumber()
-          time = time + 28800
+          time = time + 28800 -50000
 
           let improve = await calendar.Converter(time,true)
 
-          await loanitem.TrasferTest(account[3],account[2],NFT[3],false,false,improve,0,1,{from:account[3]})
+
+         
+          await loanitem.TrasferTest(account[3],account[2],NFT[3],"Riconsegna",improve,0,{from:account[3]})
 
            let result = await calendar.Available(4)
-          assert.equal(result,"Waiting")*/
+          assert.equal(result,"Waiting")
 
         })
         it('Relese-LoanItem ', async () => {
-        /*  let account = await web3.eth.getAccounts()
+         let account = await web3.eth.getAccounts()
           let NFT = await itemfarm.getAllTokenAddresses() 
 
-          await loanitem.ReleseW(NFT[3],account[3],0,1,{from:account[2]})
+          await loanitem.ReleseW(NFT[3],account[3],0,{from:account[2]})
 
           let result = await calendar.Available(4)
           assert.equal(result,"Available")         
@@ -168,8 +196,8 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
           result = await loanitem.CautionId(4,0)
           assert.equal(result,"0x0000000000000000000000000000000000000000")
 
-          result = await loanitem.LoanItem(NFT[3])
-          assert.equal(result,false)
+          result = await loanitem.StatusItem(NFT[3])
+          assert.equal(result,"")
 
           
           //result = await loanitem.PreLItem(1).to()   
