@@ -5,7 +5,7 @@ import "./ItemFarm.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-
+import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * The ItemTemplate is ERC721 contract does this and that...
  */
@@ -137,37 +137,39 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 
  contract ItemTemplate is ERC721 /*ERC721Enumerable,Ownable*/ {
- 	address public _owner;
- 	string public _name;
- 	string public _description;
- 	string public _imagehash;
- 	string public Url;
-  uint public _id;
-  ItemFarm itemfarm;
- 	
+    address public _owner;
+    string public _name;
+    string public _description;
+    string public _imagehash;
+    string public _imgURL;
+    string public Url;
+    uint public _id;
+    ItemFarm itemfarm;
+    
   
 
 
   constructor(string memory Name,
-  			  string memory description,
-  			  string memory ImageHash,
-  			  address Loanitem,
-  			  address owner,
-  			  uint id,
+              string memory description,
+              string memory ImageHash,
+              string memory ImgURL,
+              address Loanitem,
+              address owner,
+              uint id,
           string memory URL ) 
-  			public ERC721(Name,ImageHash) {
-  	
+            public ERC721(Name,ImageHash) {
+    
 
-  	_name = Name;
-  	_description = description;
-  	_imagehash = ImageHash;
-  	_owner = owner;
-  	//loanitem = LoanItem(Loanitem);
-  	_id = id;
+    _name = Name;
+    _description = description;
+    _imagehash = ImageHash;
+    _owner = owner;
+    //loanitem = LoanItem(Loanitem);
+    _id = id;
     Url = URL;
-  	//da aggiungere metadati json URL
-
-  	_mint(_owner,_id);
+    //da aggiungere metadati json URL
+    _imgURL = ImgURL;
+    _mint(_owner,_id);
 
     Url = tokenURI(_id);
 

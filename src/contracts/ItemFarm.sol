@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import"./LitemCalendar.sol";
 import"./ItemTemplate.sol";
 contract ItemFarm {
@@ -20,6 +19,7 @@ contract ItemFarm {
       uint id;
       string namet;
       string phots;
+      string imgURL;
       string description;
       string Url;
       address own;
@@ -38,7 +38,7 @@ contract ItemFarm {
         
          }
 
-      function addNewItem(string memory _imgHash,string memory _description, string memory namef,address owner,string memory Url) public {
+      function addNewItem(string memory _imgHash,string memory _description,string memory _imgURL, string memory namef,address owner,string memory Url) public {
     
         require(bytes(namef).length > 0);
         require(bytes(_description).length > 0);
@@ -50,11 +50,11 @@ contract ItemFarm {
         
         
      
-        ItemTemp = new ItemTemplate(namef,_description,_imgHash,address(this),owner,countAttrezzi,Url);
+        ItemTemp = new ItemTemplate(namef,_description,_imgHash,_imgURL,address(this),owner,countAttrezzi,Url);
         
         ItemById[countAttrezzi]= ItemTemp;
 
-        tokenId[countAttrezzi] = TokenNFT(countAttrezzi,namef,_imgHash,_description,Url,owner,ItemTemp);
+        tokenId[countAttrezzi] = TokenNFT(countAttrezzi,namef,_imgHash,_imgURL,_description,Url,owner,ItemTemp);
         
        ItemCreatedAddresses.push(address(ItemTemp));  
     }
@@ -87,7 +87,6 @@ contract ItemFarm {
 
 
 }
-
 
 
 

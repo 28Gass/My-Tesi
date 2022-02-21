@@ -30,11 +30,11 @@ const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' 
    
    
 
-    await itemfarm.addNewItem("1233","5att","Primo Item",account[0],"")
-    await itemfarm.addNewItem("1234","4att","Secondo Item",account[0],"")
-    await itemfarm.addNewItem("1235","3att","terzo Item",account[1],"")
-    await itemfarm.addNewItem("1236","2att","Quarto Item",account[2],"",{from: account[2]})
-    await itemfarm.addNewItem("1237","1att","Quinto Item",account[2],"")
+    await itemfarm.addNewItem("1233","5att","URL img","Primo Item",account[0],"")
+    await itemfarm.addNewItem("1234","4att","URL img","Secondo Item",account[0],"")
+    await itemfarm.addNewItem("1235","3att","URL img","terzo Item",account[1],"")
+    await itemfarm.addNewItem("1236","2att","URL img","Quarto Item",account[2],"",{from: account[2]})
+    await itemfarm.addNewItem("1237","1att","URL img","Quinto Item",account[2],"")
    
     })
           it('Add Coin  ', async () => {

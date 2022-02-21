@@ -228,7 +228,13 @@ contract LoanItem {
         delete CautionId[ItemtoRelese._id()][i];
         delete StatusItem[_id];
         uint iner = find(_id,msg.sender,false);
-        TokenTemplate(UserLoaningItem[msg.sender][iner].CoinSy).transfer(msg.sender,UserLoaningItem[msg.sender][iner].caution,_usr); 
+        if(_caution>0){
+        //approve
+        TokenTemplate(UserLoaningItem[msg.sender][iner].CoinSy).transfer(msg.sender,_caution,_usr);
+        }else{
+        //approve
+        TokenTemplate(UserLoaningItem[msg.sender][iner].CoinSy).transfer(msg.sender,UserLoaningItem[msg.sender][iner].caution,_usr);
+      } 
         uint k;
           k = find(_id,_usr,true);
           delete PreLItem[_usr][k];
