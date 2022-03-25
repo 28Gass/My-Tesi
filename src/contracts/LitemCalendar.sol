@@ -32,7 +32,7 @@ contract Calendar   {
       }
 	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr)  external returns(bool suc) {
   //  Time();
-
+   Update();
     if(dataStart==0){
     dataStart= time;
   	}
@@ -227,7 +227,7 @@ return false;}
   return  PreorderOpen[i];
 	}
   function Relese(uint256 _id1) external{
-  	//Update();
+  	Update();
 
 	 require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
 	  bool k;

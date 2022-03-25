@@ -145,7 +145,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
     string public Url;
     uint public _id;
     ItemFarm itemfarm;
-    
+    address public temp_own;
   
 
 
@@ -164,7 +164,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
     _description = description;
     _imagehash = ImageHash;
     _owner = owner;
-    //loanitem = LoanItem(Loanitem);
+    itemfarm = ItemFarm(Loanitem);
     _id = id;
     Url = URL;
     //da aggiungere metadati json URL
@@ -227,13 +227,34 @@ https://www.base64decode.org/*/
 
     function transfert(address buyer)public returns(bool res)  {
       _transfer(_owner,buyer,_id);
+      itemfarm.remuvePoss(_owner,address(this));
       _owner = ownerOf(_id);
+      itemfarm.addToPossessed(buyer, address(this));
       res = true;
-
+     //aggiungere metodo che cambia l'address della item Farm
     }
-    function UrlT() public view returns(string memory){
+    function getimgUrl() public view returns(string memory){
 
-      return Url;
+      return _imgURL;
+    }
+
+     function getimghash() public view returns(string memory){
+
+      return _imagehash;
+    }
+     function getowner() public view returns(address){
+
+      return _owner;
+    }
+    function getdescription() public view returns(string memory){
+
+      return _description;
+    }
+    function setTempOwn(address client)public{
+        temp_own=client;
+    }
+    function deleteTOwn()public{
+      delete temp_own;
     }
 
 }
