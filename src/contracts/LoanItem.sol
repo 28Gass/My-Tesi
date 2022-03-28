@@ -202,7 +202,7 @@ contract LoanItem {
                    // TokenTemplate(UserLoaningItem[_from][iner].CoinSy).transfer(_to,UserLoaningItem[_from][iner].caution,_from);
                    // CautionId[ItemtoLoan._id()].push(_to); 
                   //  emit ItemEvent(operation,address(0),_item,UserLoaningItem[_from][iner].CoinSy,0,0,"",address(0),address(0),Calendario.Time(),0,0);
-                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,dateS,dateF,"Prenotato");
+                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,Calendario.Converter(dateS,true),Calendario.Converter(dateF,true),"Prenotato");
                     PreLItem[_to][_item]=Tempo;
                     addToPossessed(msg.sender,_item);
                     return;
@@ -212,9 +212,9 @@ contract LoanItem {
             return;
             }
              
-              if(keccak256(bytes(operation)) == keccak256(bytes("RitiroPre")) && PreLItem[msg.sender][_item].to == msg.sender &&keccak256(bytes(PreLItem[msg.sender][_item].status))==keccak256(bytes("Prenotato")) ){ 
+              if(keccak256(bytes(operation)) == keccak256(bytes("RitiroPre")) /*&& PreLItem[msg.sender][_item].to == msg.sender &&keccak256(bytes(PreLItem[msg.sender][_item].status))==keccak256(bytes("Prenotato"))*/ ){ 
                   if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).balanceOf(_to)>=UserLoaningItem[_from][_item].price ){
-                    if(Calendario.AcquirePre(ItemtoLoan._id(),msg.sender) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){ 
+                    if(Calendario.AcquirePre(ItemtoLoan._id(),msg.sender,dateS) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){ 
                     addToPossessed(msg.sender,_item);
                     PreLItem[msg.sender][_item].status= "Ritirato";
                     ItemtoLoan.setTempOwn(msg.sender);
@@ -230,7 +230,7 @@ contract LoanItem {
               //noleggio sul momento
               if(dateF>0 && keccak256(bytes(operation)) == keccak256(bytes("OnFly")) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){
               if(Calendario.Acquire(ItemtoLoan._id(),msg.sender,dateF)){
-                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,block.timestamp,dateF,"Ritirato");
+                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,Calendario.Converter(block.timestamp,false),Calendario.Converter(dateF,true),"Ritirato");
                     PreLItem[_to][_item]=Tempo;
                 //CautionId[ItemtoLoan._id()].push(_to);
                 addToPossessed(msg.sender,_item);
@@ -274,8 +274,7 @@ contract LoanItem {
       } 
          ItemtoRelese.deleteTOwn();
         remuvePoss(_usr,_id);
-         PreItem storage temp;
-          delete PreLItem[_usr][_id];
+         // delete PreLItem[_usr][_id];
    
         return;
        
@@ -291,18 +290,20 @@ contract LoanItem {
 
 return CautionId[i];
 
-}*/
+}
 function getLoanStatus(address item)public returns(string memory){
 
  return StatusItem[item];
-}
+}*/
 /*function getLoanAll()public returns(address[] memory){
   return itemLoanSell;
 }*/
 
-function getAItemData(address item)public view returns(address,address,uint256,uint256,string memory){
+function getAItemData(address item)public view returns(address,address,uint256,uint256,string memory,string memory){
     
-    return(ItemData[item].addr,ItemData[item].CoinSy,ItemData[item].price,ItemData[item].caution,ItemData[item].place);
+    return(ItemData[item].addr,ItemData[item].CoinSy,ItemData[item].price,ItemData[item].caution,ItemData[item].place,
+          StatusItem[item]
+          );
 }
 
 function getPreData(address own,address i)public view returns(address,address,uint,uint,uint,string memory){

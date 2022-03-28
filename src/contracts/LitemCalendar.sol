@@ -13,7 +13,9 @@ contract Calendar   {
     uint256[] Status;
     uint256 public Orders;
     mapping(uint256=>uint256[]) public PreorderOpen;
-  
+  	mapping(uint256=>mapping(uint256=>uint256))public suppPreorderOpen;
+		
+
 	constructor() public { 
       
 
@@ -21,7 +23,7 @@ contract Calendar   {
 
 	}
   	function Time() public returns(uint256) {
-        time = block.timestamp+ fusoorario;
+        time = block.timestamp/*+ fusoorario*/;
         return time;
       }
 	/*Funzione per testare le scadenze in update*/
@@ -50,6 +52,7 @@ contract Calendar   {
 
         if(CheckAvialable(_id,date1,date2)){
     PreorderOpen[_id].push(date1);
+		suppPreorderOpen[_id][date1]= PreorderOpen[_id].length -1;
 		Preorderstart[_id][date1]= _usr;
 		Preorderend[_id][date1]=date2;
 		if(keccak256(bytes("Available"))==keccak256(bytes(Available[_id])))	
@@ -87,14 +90,7 @@ contract Calendar   {
 				}
 			}
 
-		/*
-			for(uint256 i=_dataStart;i <= _dataEnd;i= i + 14400){
-				if(Preorderstart[idA][i]!=address(0x0) || Preorderend[idA][i]==i){
-					ret =false;
-					test="Sono Qui";
 
-				}
-			}*/
 		}
 		if(keccak256(bytes(Available[idA])) == keccak256(bytes("Available"))){
 		ret = true;
@@ -160,14 +156,15 @@ function Back(uint256 _id1,uint256 _dateS) external returns(bool){
 
          delete	Preorderstart[_id1][_dateS];
 				 delete Preorderend[_id1][_dateS];
-				 for(uint256 i; i< PreorderOpen[_id1].length;i++){
+				 uint256 i = suppPreorderOpen[_id1][_dateS];
 				 	if(PreorderOpen[_id1][i]==_dateS){
 				 		delete PreorderOpen[_id1][i];
+				 		delete suppPreorderOpen[_id1][_dateS];
 				 		return true;
 
 				 	}
 
-         } }
+         } 
        }
        return false;
 }
@@ -183,18 +180,18 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
                                //alle 20
                                return date1;
 }
-function AcquirePre(uint256 idP,address usr) public   returns(bool ret){
+function AcquirePre(uint256 idP,address usr,uint256 _dateS) public   returns(bool ret){
 	ret = false;
 
   Update();
 
-  		for(uint256 i;i< PreorderOpen[idP].length; i++ ){
+  			uint256 i = suppPreorderOpen[idP][_dateS];
   			if(Preorderstart[idP][PreorderOpen[idP][i]]==usr ){//fifo
   				if( time>=PreorderOpen[idP][i] && ((keccak256(bytes(Available[idP])) == keccak256(bytes("Available")))|| keccak256(bytes(Available[idP])) == keccak256(bytes("Preordered")))){
   				Available[idP]="Busy";							
   				return true;}
   		}
-		}	
+		
 //PreorderOpen verificare la data che ci sia come il proprietario del pre-ordine sia 
 //quello giusto
 
