@@ -13,38 +13,21 @@ contract LoanItem {
     Calendar public Calendario;
     TokenFactory public Tkfactory;  
   
-    // mapping(address => bool) public permissions;
-    // mapping(uint256 => uint256) public Cds;
-  
-    // uint256 orders;
      
      mapping(address=>string) public StatusItem;
      mapping(address => mapping(address=>LItem)) public UserLoaningItem;
-     //       owner             allitem->dataItem
-
-
-    // mapping(address=>PreItem[])public PreLItem;
-   //  mapping(uint256=>address[]) public CautionId;
      mapping(address =>LItem)public ItemData;
-
-     
-     //address[] public itemLoanSell;
-
-
-
+ 
     address public owner;
 
-
-
-
-       struct Registry {
+       struct dataR {
         address[] itemAddresses; //this will contain the addresses of the tokens possessed by an owner
         mapping(address => bool) alreadyIn; //this is just to help in fast checks (to avoid iterating over an array)
         mapping(address => uint256)dataS;
        // mapping(address => operation)
     }
 
-    mapping(address => Registry) internal LoanPos; 
+    mapping(address => dataR) internal LoanPos; 
 
  //   mapping(address => Registry) internal LoanPre; 
   //  mapping(uint256 => PreItem) internal PreLItem;
@@ -102,12 +85,6 @@ contract LoanItem {
          }
     
 
- /*function CoinAdd(string memory Symbl)internal returns(address) {
-    address x;
-    (x,,,,,,)= Tkfactory.getToken(Symbl);
-    //require(x!=address(0x0));
-    return x;
- }*/
   
 
 
@@ -154,8 +131,8 @@ contract LoanItem {
 
    
       function TrasferTest(address _from, address _to,address _item,string memory operation,uint256 dateS,uint256 dateF) external {
-
-      
+          ItemTemplate ItemtoSell = ItemTemplate(_item);
+          address ownerItem = ItemtoSell.ownerOf(ItemtoSell._id());
           ItemTemplate ItemtoLoan = ItemTemplate(_item);
           require(bytes(ItemtoLoan._name()).length > 0 );
           require(keccak256(bytes(Calendario.Available(ItemtoLoan._id()))) != keccak256(bytes("Waiting")),"token is waiting ");
@@ -165,14 +142,14 @@ contract LoanItem {
 
             if(keccak256(bytes(operation)) == keccak256(bytes("Sell"))&& keccak256(bytes(StatusItem[_item])) == keccak256(bytes("Selling"))){
               ItemTemplate ItemtoSell = ItemTemplate(_item);
-              address ownerItem = ItemtoSell.ownerOf(ItemtoSell._id());
-            //if(TokenTemplate(UserLoaningItem[_from][iner].CoinSy).transferFrom(owner,_to,UserLoaningItem[_from][iner].price)){
+              
+            if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].price)){
                  require(ItemtoSell.ownerOf(ItemtoSell._id())==_from);
                 ItemtoSell.transfert(_to);
                 delete StatusItem[_item];
                 delete UserLoaningItem[_from][_item];
                 delete ItemData[_item]; 
-              //}
+              }
 
                 return;
               }
@@ -189,19 +166,17 @@ contract LoanItem {
             return;
           }
             }
-           /* else if(_to == ItemtoLoan.ownerOf(ItemtoLoan._id())  && keccak256(bytes(Calendario.Available(ItemtoLoan._id()))) == keccak256(bytes("Preordered"))){
-              //caso in cui voglio cancellare una prenotazione
-              return;
-            }*/
+      
             
             if(keccak256(bytes(operation)) == keccak256(bytes("Prenotazione")) && dateF>0 &&_from == ItemtoLoan.ownerOf(ItemtoLoan._id())){
               //prenotazione Noleggio pago la cauzione in anticipo   
              
-                if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).balanceOf(_to)>=UserLoaningItem[_from][_item].caution ){
-                  if(Calendario.Pre_Order(dateS,dateF,ItemtoLoan._id(),msg.sender)) {
+                if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].caution)){
+                  if(Calendario.Pre_Order(dateS,dateF,ItemtoLoan._id(),msg.sender,ownerItem)) {
                    // TokenTemplate(UserLoaningItem[_from][iner].CoinSy).transfer(_to,UserLoaningItem[_from][iner].caution,_from);
                    // CautionId[ItemtoLoan._id()].push(_to); 
                   //  emit ItemEvent(operation,address(0),_item,UserLoaningItem[_from][iner].CoinSy,0,0,"",address(0),address(0),Calendario.Time(),0,0);
+                    ItemtoLoan.setTempOwn(msg.sender);
                     PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,Calendario.Converter(dateS,true),Calendario.Converter(dateF,true),"Prenotato");
                     PreLItem[_to][_item]=Tempo;
                     addToPossessed(msg.sender,_item);
@@ -213,9 +188,10 @@ contract LoanItem {
             }
              
               if(keccak256(bytes(operation)) == keccak256(bytes("RitiroPre")) /*&& PreLItem[msg.sender][_item].to == msg.sender &&keccak256(bytes(PreLItem[msg.sender][_item].status))==keccak256(bytes("Prenotato"))*/ ){ 
-                  if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).balanceOf(_to)>=UserLoaningItem[_from][_item].price ){
+                 
                     if(Calendario.AcquirePre(ItemtoLoan._id(),msg.sender,dateS) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){ 
-                    addToPossessed(msg.sender,_item);
+                       if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].price)){
+                    //addToPossessed(msg.sender,_item);
                     PreLItem[msg.sender][_item].status= "Ritirato";
                     ItemtoLoan.setTempOwn(msg.sender);
                 //emit LoanPre(_from,_to,_item,Calendario.Time(),dateS,dateF,orders,"Acq-Pre-Loan");
@@ -228,8 +204,10 @@ contract LoanItem {
               }
 
               //noleggio sul momento
+             
               if(dateF>0 && keccak256(bytes(operation)) == keccak256(bytes("OnFly")) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){
-              if(Calendario.Acquire(ItemtoLoan._id(),msg.sender,dateF)){
+              if(Calendario.Acquire(_from,ItemtoLoan._id(),msg.sender,dateF)){
+                 if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].price+UserLoaningItem[_from][_item].caution)){
                     PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,Calendario.Converter(block.timestamp,false),Calendario.Converter(dateF,true),"Ritirato");
                     PreLItem[_to][_item]=Tempo;
                 //CautionId[ItemtoLoan._id()].push(_to);
@@ -238,7 +216,7 @@ contract LoanItem {
                // emit LoanPre(_from,_to,_item,Calendario.Time(),dateS,dateF,orders,"Normal-Loan");
               return;
             }
-          }
+          }}
 
           return;
       }
@@ -248,56 +226,41 @@ contract LoanItem {
       function ReleseW(address _id,address _usr, uint256 _caution ) public{
 
         ItemTemplate ItemtoRelese = ItemTemplate(_id);
+        address ownerItem = ItemtoRelese.ownerOf(ItemtoRelese._id());
         uint id=ItemtoRelese._id();
+
     //si potrebbe gestire il caso in cui la cauzione restituita sia variabile
         require(bytes(ItemtoRelese._name()).length > 0);
         require(ItemtoRelese.ownerOf(id)==msg.sender);
    
-        //
-      // for(uint256 i=0; i<CautionId[ItemtoRelese._id()].length;i++){
-
-  
-           
+   
+        if(TokenTemplate(UserLoaningItem[ownerItem][_id].CoinSy).transferFrom(ownerItem,_usr,UserLoaningItem[ownerItem][_id].caution)){         
         if(PreLItem[_usr][_id].to==_usr && _usr!=msg.sender && PreLItem[_usr][_id].from == msg.sender){
           
           Calendario.Relese(id);
-      //  address temp = CautionId[ItemtoRelese._id()][i];
-       // delete CautionId[ItemtoRelese._id()][i];
-       // delete StatusItem[_id];
+          Calendario.deleteOrder(PreLItem[_usr][_id].timeS,msg.sender,ItemtoRelese._id());
      
         if(_caution>0){
-        //approve
-       // TokenTemplate(UserLoaningItem[msg.sender][iner].CoinSy).transfer(msg.sender,_caution,_usr);
+        
         }else{
-        //approve
-      //  TokenTemplate(UserLoaningItem[msg.sender][iner].CoinSy).transfer(msg.sender,UserLoaningItem[msg.sender][iner].caution,_usr);
+      
       } 
          ItemtoRelese.deleteTOwn();
         remuvePoss(_usr,_id);
-         // delete PreLItem[_usr][_id];
+          delete PreLItem[_usr][_id];
    
         return;
        
             }  
-     //    }
+          }
+  
          return;
        }
          
       
 
 
-/*function CaId(uint256 i) public virtual view returns(address[] memory){
 
-return CautionId[i];
-
-}
-function getLoanStatus(address item)public returns(string memory){
-
- return StatusItem[item];
-}*/
-/*function getLoanAll()public returns(address[] memory){
-  return itemLoanSell;
-}*/
 
 function getAItemData(address item)public view returns(address,address,uint256,uint256,string memory,string memory){
     
@@ -319,13 +282,9 @@ function getPossessedLoans() public view returns(address[] memory){
         return LoanPos[msg.sender].itemAddresses;
   
     } 
-function getStartDate(address itemaddr)public view returns(uint256){
-        
-        return PreLItem[msg.sender][itemaddr].timeS;
-        // return LoanPos[msg.sender].dataS[itemaddr];
-}
+
      function remuvePoss(address oldown,address _tokenAddress)public{
-       // require(ItemTemplate(_tokenAddress)._owner()== oldown);
+       
         if(LoanPos[oldown].alreadyIn[_tokenAddress] == true){ //else is already correctly populated
             LoanPos[oldown].alreadyIn[_tokenAddress] = false;
             address[] storage remuvePossessed = LoanPos[oldown].itemAddresses;
