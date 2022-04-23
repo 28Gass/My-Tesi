@@ -136,44 +136,39 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 
- contract ItemTemplate is ERC721 /*ERC721Enumerable,Ownable*/ {
-    address public _owner;
-    string public _name;
-    string public _description;
-    string public _imagehash;
-    string public _imgURL;
-    string public Url;
-    uint public _id;
-    ItemFarm itemfarm;
-    address public temp_own;
+ contract ItemTemplate is ERC721  {
+                    address public _owner;
+                    string public _name;
+                    string public _description;
+                    string public _imagehash;
+                    string public _imgURL;
+                    string public Url;
+                    uint public _id;
+                    ItemFarm itemfarm;
+                    address public temp_own;
   
+                    constructor(string memory Name,
+                              string memory description,
+                              string memory ImageHash,
+                              string memory ImgURL,
+                              address Loanitem,
+                              address owner,
+                              uint id,
+                              string memory URL ) 
+                                        public ERC721(Name,ImageHash) {
+                    
+                            _name = Name;
+                            _description = description;
+                            _imagehash = ImageHash;
+                            _owner = owner;
+                            itemfarm = ItemFarm(Loanitem);
+                            _id = id;
+                            Url = URL;
+                            _imgURL = ImgURL;
+                            _mint(_owner,_id);
+                            Url = tokenURI(_id);
 
-
-  constructor(string memory Name,
-              string memory description,
-              string memory ImageHash,
-              string memory ImgURL,
-              address Loanitem,
-              address owner,
-              uint id,
-          string memory URL ) 
-            public ERC721(Name,ImageHash) {
-    
-
-    _name = Name;
-    _description = description;
-    _imagehash = ImageHash;
-    _owner = owner;
-    itemfarm = ItemFarm(Loanitem);
-    _id = id;
-    Url = URL;
-    //da aggiungere metadati json URL
-    _imgURL = ImgURL;
-    _mint(_owner,_id);
-
-    Url = tokenURI(_id);
-
-  }
+                         }
   
      function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
         if (_i == 0) {
@@ -231,7 +226,7 @@ https://www.base64decode.org/*/
       _owner = ownerOf(_id);
       itemfarm.addToPossessed(buyer, address(this));
       res = true;
-     //aggiungere metodo che cambia l'address della item Farm
+     
     }
     function getimgUrl() public view returns(string memory){
 
