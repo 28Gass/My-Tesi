@@ -69,6 +69,7 @@ contract Calendar   {
 						suppPreorderOpen[_id][date1]= PreorderOpen[_id].length -1;
 						Preorderstart[_id][date1]= _usr;
 						Preorderend[_id][date1]=date2;
+						suc = true;
 					if(keccak256(bytes("Available"))==keccak256(bytes(Available[_id])))	
 					Available[_id]="Preordered";
 							suc = true;
@@ -149,13 +150,19 @@ function setFusoOraio()public{
 		fusoorario=0;
 	}
 }
-function Back(uint256 _id1,uint256 _dateS) external returns(bool){
+function Back(uint256 _id1,uint256 _dateS, bool op) external returns(bool){
 
 	_dateS = Converter(_dateS,false);
     require(Preorderend[_id1][_dateS]>0,"Errore");
-	 if(keccak256(bytes(Available[_id1])) == keccak256(bytes("Busy"))&& _dateS>0){
+	 if(_dateS>0){
 	  bool k;
-          k = setAvailable(_id1,"Waiting"); 
+				if(op){
+					k=true;
+				}else{
+
+          k=setAvailable(_id1,"Waiting");
+    	}
+  
          if(k){
          delete	Preorderstart[_id1][_dateS];
 				 delete Preorderend[_id1][_dateS];
@@ -206,6 +213,7 @@ function Acquire(address owner,uint256 idP,address usr,uint256 _dataF) public   
       k =  setAvailable(idP,"Busy"); 
       require(k == true, "Non disponibile2");
    		PreorderOpen[idP].push(dateSt);
+   		suppPreorderOpen[idP][dateSt]= PreorderOpen[idP].length -1;
    		Preorderstart[idP][dateSt]= usr;
 		  Preorderend[idP][dateSt]=_dataF;
       return true;
