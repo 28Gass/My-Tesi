@@ -45,17 +45,23 @@ contract Calendar   {
         time = time + i;
       }*/
 
-	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr,address owner)  external returns(bool suc) {
+	function Pre_Order(uint256 dataStart, uint256 dataEnd, uint256 _id,address _usr,address owner,bool op)  external returns(bool suc) {
 	    Time();
 	    if(dataStart==0){
 	    dataStart= time;
 	  	}
 	    suc = false;
 	   	require(dataEnd>0,"dataEnd is 0");
-	    require(time <= dataStart,"Not possible in the past");
+	    require(Converter(time,false) <= dataStart,"Not possible in the past");
 	    require(dataEnd<= time + 2592000,"more than 30gg" );
 	    require(dataStart<dataEnd);
-	    uint256 date1 = Converter(dataStart,true);
+	       uint256 date1;
+	    if(!op){
+	     date1 = Converter(dataStart,false);
+	    }
+	    else{
+	    	date1 = Converter(dataStart,true);
+	    }
 	    uint256 date2 = Converter(dataEnd,true);
 			require(date1<date2,"<");//la prenotazione vale almeno se dura 4 ore
 	     // if(_id>Orders)
@@ -116,10 +122,12 @@ contract Calendar   {
 	function deleteOrder(uint256 dataStart,address owner, uint256 _id)public{
 
 		    uint256[] storage temprem = AllInfo[owner][_id].AllDates;
+		    require(dataStart==temprem[AllInfo[owner][_id].supportDate[dataStart]],"Non corrispondono");
 		    delete temprem[AllInfo[owner][_id].supportDate[dataStart]];
 
 		    AllInfo[owner][_id].AllDates=temprem;
-		    AllInfo[owner][_id].supportDate[dataStart];
+		   	delete AllInfo[owner][_id].supportDate[dataStart];
+		   	delete AllInfo[owner][_id].data[dataStart];
        
 	}
  function getAllOrder(address owner,uint256 _id)public returns(uint256[] memory){
@@ -158,6 +166,7 @@ function Back(uint256 _id1,uint256 _dateS, bool op) external returns(bool){
 	  bool k;
 				if(op){
 					k=true;
+
 				}else{
 
           k=setAvailable(_id1,"Waiting");
@@ -170,6 +179,7 @@ function Back(uint256 _id1,uint256 _dateS, bool op) external returns(bool){
 				 	if(PreorderOpen[_id1][i]==_dateS){
 				 		delete PreorderOpen[_id1][i];
 				 		delete suppPreorderOpen[_id1][_dateS];
+				 		Relese(_id1);
 				 		return true;
 				 	}
          } 
@@ -226,7 +236,7 @@ return false;}
      
   return  PreorderOpen[i];
 	}
-  function Relese(uint256 _id1) external{
+  function Relese(uint256 _id1) public{
   	
 
 	// require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
