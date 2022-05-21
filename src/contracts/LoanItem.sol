@@ -50,6 +50,7 @@ contract LoanItem {
     string status;
     bool pOwn;
     bool uOwn;
+    uint daysn;
     }
 
  /*   event ItemEvent(
@@ -77,29 +78,28 @@ contract LoanItem {
          }
     
      function AddToLoanOrSellItem(address itemaddr,address CoinSimb,uint Price,uint caution,string memory PLace,
-                                  string memory operation) public  returns(string memory) {
+                                  uint operation) public  returns(string memory) {
       require(keccak256(bytes(StatusItem[itemaddr])) == keccak256(bytes("")));
       //address x = CoinAdd(CoinSimb); 
       address x = CoinSimb;
       if(x != address(0x0)){
-        if( keccak256(bytes(operation)) == keccak256(bytes("LoanItem"))&& itemaddr!= address(0x0)   ){
+        if( operation == 0 && itemaddr!= address(0x0)   ){
           ItemTemplate ItemtoLoan = ItemTemplate(itemaddr);
              LItem memory Temp = LItem(ItemtoLoan,itemaddr,x,Price,caution,PLace,"LoaningItem");
              UserLoaningItem[msg.sender][itemaddr]=Temp;   
              ItemData[itemaddr]= Temp;
              StatusItem[itemaddr]="LoaningItem";
              Calendario.setAvailable(ItemtoLoan._id(),"Available");
-           //  emit ItemEvent(operation,ItemtoLoan,itemaddr,x,Price,caution,PLace,address(0),address(0),Calendario.Time(),0,0);
-             
+          // emit ItemEvent(operation,ItemtoLoan,itemaddr,x,Price,caution,PLace,address(0),address(0),Calendario.Time(),0,0);  
             return StatusItem[itemaddr];
       }
-       else if( keccak256(bytes(operation)) == keccak256(bytes("SellIt"))){
+       else if(operation==1){
         ItemTemplate ItemtoSell = ItemTemplate(itemaddr);   
         LItem memory Temp = LItem(ItemtoSell,itemaddr,x,Price,caution,PLace,"SellingItem");
         UserLoaningItem[msg.sender][itemaddr]=Temp;
         ItemData[itemaddr]= Temp;
         StatusItem[itemaddr]="Selling";
-       // emit ItemEvent(operation,ItemtoSell,itemaddr,x,Price,caution,PLace,address(0),address(0),Calendario.Time(),0,0);
+        //emit ItemEvent(operation,ItemtoSell,itemaddr,x,Price,caution,PLace,address(0),address(0),Calendario.Time(),0,0);
         return StatusItem[itemaddr];
       }
     } 
@@ -107,7 +107,7 @@ contract LoanItem {
   }
 
    
-      function TransferOperation(address _from, address _to,address _item,string memory operation,uint256 dateS,uint256 dateF) external {
+      function TransferOperation(address _from, address _to,address _item,uint operation,uint256 dateS,uint256 dateF,uint Rdays) external {
           
           ItemTemplate ItemtoLoan = ItemTemplate(_item);
           address ownerItem = ItemtoLoan.ownerOf(ItemtoLoan._id());
@@ -115,7 +115,8 @@ contract LoanItem {
           require(bytes(ItemtoLoan._name()).length > 0 );
                 
             //oggetto in vendita
-            if(keccak256(bytes(operation)) == keccak256(bytes("Sell"))&& keccak256(bytes(StatusItem[_item])) == keccak256(bytes("Selling"))){
+            if(operation == 0
+              && keccak256(bytes(StatusItem[_item])) == keccak256(bytes("Selling"))){
               if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].price)){
                  require(ItemtoLoan.ownerOf(ItemtoLoan._id())==_from);
                 ItemtoLoan.transfert(_to);
@@ -124,34 +125,31 @@ contract LoanItem {
                 delete ItemData[_item]; 
                 return;
               }
-              }
+            }
 
 
-            if((keccak256(bytes(operation)) == keccak256(bytes("Prenotazione"))||keccak256(bytes(operation)) == keccak256(bytes("OnFly"))) && dateF>0 &&_from == ItemtoLoan.ownerOf(ItemtoLoan._id())
+            if(operation==1 ||operation==2 
+            && dateF>0 &&_from == ItemtoLoan.ownerOf(ItemtoLoan._id())
               ){
-              if(ownerItem==msg.sender){
-                if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].caution)){  
+              if(ownerItem==msg.sender && keccak256(bytes(PreLItem[_to][_item].status))==keccak256(bytes("RPrenotato")) ){
+                if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,address(this),
+                    UserLoaningItem[_from][_item].price*PreLItem[_to][_item].daysn)){  
                     PreLItem[_to][_item].status="Prenotato";
                     return;  
-                }}
-
-
-              if(keccak256(bytes(operation)) == keccak256(bytes("Prenotazione")))
+                }
+              }
+              if(operation == 1)
                 time = true;
-                if(dateS==0){
-                timeI=Calendario.Converter(block.timestamp,time);
-                } else{
+                  if(dateS==0){
+                    timeI=Calendario.Converter(block.timestamp,time);
+                  }
+                  else{
                  timeI=Calendario.Converter(dateS,time);
-              
                 }
                 timeF=Calendario.Converter(dateF,true);
-
-
               //prenotazione Noleggio pago la cauzione in anticipo 
-               
-              
-                if(Calendario.Pre_Order(dateS,dateF,ItemtoLoan._id(),_to,ownerItem,time)){
-                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,timeI,timeF,"RPrenotato",false,false);
+                if(Calendario.Pre_Order(dateS,dateF,ItemtoLoan._id(),_to,ownerItem,time)&&Rdays>0){
+                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,timeI,timeF,"RPrenotato",false,false,Rdays);
                     PreLItem[_to][_item]=Tempo;
                     addToPossessed(msg.sender,_item);
                     return;
@@ -162,26 +160,17 @@ contract LoanItem {
                     
                 require(keccak256(bytes(Calendario.Available(ItemtoLoan._id()))) != keccak256(bytes("Waiting")));
                 
-                if(keccak256(bytes(operation)) == keccak256(bytes("Cancella")) && msg.sender==PreLItem[_to][_item].to&&
+                if(operation==3 && msg.sender==PreLItem[_to][_item].to&&
                  keccak256(bytes(PreLItem[_to][_item].status))!=keccak256(bytes("Ritirato"))){
                 
-                  PreLItem[_to][_item].status=operation;
+                  PreLItem[_to][_item].status="Cancella";
                   return;
 
                 }
-            /*  if(Calendario.Pre_Order(dateS,dateF,ItemtoLoan._id(),msg.sender,ownerItem)&&dateF>0 && keccak256(bytes(operation)) == keccak256(bytes("OnFly")) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){
-                 if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].caution)){
-                    PreItem memory Tempo = PreItem(_from,_to,_item,block.timestamp,Calendario.Converter(block.timestamp,false),Calendario.Converter(dateF,true),"Prenotato");
-                    PreLItem[_to][_item]=Tempo;
-                    addToPossessed(msg.sender,_item);
-                    ItemtoLoan.setTempOwn(msg.sender);
-              return;
-            }
-          }*/
           
              
             //riconsegna item  
-          if( dateS>0 &&_to == ItemtoLoan.ownerOf(ItemtoLoan._id()) &&   keccak256(bytes(operation)) == keccak256(bytes("Riconsegna")) 
+          if( dateS>0 &&_to == ItemtoLoan.ownerOf(ItemtoLoan._id()) && operation==4 
              && keccak256(bytes(PreLItem[msg.sender][_item].status))==keccak256(bytes("Ritirato")) ){                           
             if(Calendario.Back(ItemtoLoan._id(),dateS,false)){
             PreLItem[msg.sender][_item].status="Riconsegnato";
@@ -189,8 +178,8 @@ contract LoanItem {
             return;
           }
             }
-  
-              if(keccak256(bytes(operation)) == keccak256(bytes("RitiroPre"))){ 
+
+              if(operation==5){ 
                     if(PreLItem[_to][_item].to==msg.sender){
                       PreLItem[_to][_item].uOwn=true;
                     
@@ -200,7 +189,10 @@ contract LoanItem {
                       }
                       PreLItem[_to][_item].status="Attesa";
                       if(PreLItem[_to][_item].pOwn && PreLItem[_to][_item].uOwn){
-                       if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,ownerItem,UserLoaningItem[_from][_item].price)&&Calendario.AcquirePre(ItemtoLoan._id(),_to,dateS) && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){
+                       if(TokenTemplate(UserLoaningItem[_from][_item].CoinSy).transferFrom(_to,address(this),
+                           UserLoaningItem[_from][_item].caution)
+                        && Calendario.AcquirePre(ItemtoLoan._id(),_to,dateS) 
+                        && _from==ItemtoLoan.ownerOf(ItemtoLoan._id())){   
 
                           PreLItem[_to][_item].status= "Ritirato";
                           ItemtoLoan.setTempOwn(_to);
@@ -209,7 +201,7 @@ contract LoanItem {
                     
                   }
                   return;                  
-                  }
+              }
   
           require(false,"Operation not working");
       }
@@ -219,30 +211,42 @@ contract LoanItem {
         ItemTemplate ItemtoRelese = ItemTemplate(_id);
         uint id=ItemtoRelese._id();
         address ownerItem = ItemtoRelese.ownerOf(id);
+        uint amount;
+        if(keccak256(bytes(PreLItem[_usr][_id].status))==keccak256(bytes("Prenotato"))||
+          keccak256(bytes(PreLItem[_usr][_id].status))==keccak256(bytes("Attesa"))){
+          amount =UserLoaningItem[ownerItem][_id].price*PreLItem[_usr][_id].daysn;
+        }else{
+            amount =UserLoaningItem[ownerItem][_id].caution+(UserLoaningItem[ownerItem][_id].price*PreLItem[_usr][_id].daysn);
+        }
         
-        require(_caution<=UserLoaningItem[ownerItem][_id].caution);
-        require(ItemtoRelese.ownerOf(id)==msg.sender||PreLItem[_usr][_id].to ==msg.sender);
+        address msgs=msg.sender;
+        require(_caution<=amount);
+        require(ItemtoRelese.ownerOf(id)==msgs||PreLItem[_usr][_id].to ==msgs);
         require( keccak256(bytes( PreLItem[_usr][_id].status))!= keccak256(bytes("Ritirato")));
          if(!cancel){ 
-          if(PreLItem[_usr][_id].to==_usr && (PreLItem[_usr][_id].from == msg.sender||PreLItem[_usr][_id].to ==msg.sender)){
+          if(PreLItem[_usr][_id].to==_usr && (PreLItem[_usr][_id].from == msgs||PreLItem[_usr][_id].to ==msgs)){
 
              Calendario.deleteOrder(PreLItem[_usr][_id].timeS,PreLItem[_usr][_id].from,id);
              if(ItemtoRelese.temp_own()==_usr){ 
               ItemtoRelese.deleteTOwn();
-              Calendario.Relese(id);
-            }else{
-              Calendario.Back(id,PreLItem[_usr][_id].timeS,true);
             }
+              Calendario.Back(id,PreLItem[_usr][_id].timeS,true);
+            
               remuvePoss(_usr,_id);
               delete PreLItem[_usr][_id];
               if(notpay)
                 return;
-            if(TokenTemplate(UserLoaningItem[ownerItem][_id].CoinSy).transferFrom(ownerItem,_usr,_caution))     
+
+            if(TokenTemplate(UserLoaningItem[ownerItem][_id].CoinSy).transfer(_usr,_caution)){
+
+              TokenTemplate(UserLoaningItem[ownerItem][_id].CoinSy).transfer(ownerItem,amount-_caution);
               return;     
+              }
             }
              return;
-       }else if(keccak256(bytes(StatusItem[_id]))==keccak256(bytes("Selling"))|| keccak256(bytes(Calendario.Available(id))) == keccak256(bytes("Available"))){ 
-              delete StatusItem[_id];
+           }else if(keccak256(bytes(StatusItem[_id]))==keccak256(bytes("Selling"))
+            || keccak256(bytes(Calendario.Available(id))) == keccak256(bytes("Available"))){ 
+                delete StatusItem[_id];
                 delete UserLoaningItem[ownerItem][_id];
                 delete ItemData[_id]; 
                 return;
@@ -269,10 +273,11 @@ return(
   PreLItem[own][i].status);
 }
 
-function getPermissionPre(address own,address i)public view returns(bool,bool){
+function getPermissionPre(address own,address i)public view returns(bool,bool,uint){
   return(
      PreLItem[own][i].pOwn,
-     PreLItem[own][i].uOwn
+     PreLItem[own][i].uOwn,
+     PreLItem[own][i].daysn
       );
 }
 
@@ -299,8 +304,7 @@ function getPossessedLoans() public view returns(address[] memory){
       }
 
       function addToPossessed(address _possessor, address _tokenAddress) public{
-       // require(ItemTemplate(_tokenAddress)._owner()== _possessor ,
-        //    "_possessor must have some amount of this token to add it to his possessions");
+
         if(LoanPos[_possessor].alreadyIn[_tokenAddress] == false){ //else is already correctly populated
             address[] storage newPossessed = LoanPos[_possessor].itemAddresses;
             newPossessed.push(_tokenAddress);

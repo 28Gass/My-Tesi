@@ -164,25 +164,25 @@ function Back(uint256 _id1,uint256 _dateS, bool op) external returns(bool){
     require(Preorderend[_id1][_dateS]>0,"Errore");
 	 if(_dateS>0){
 	  bool k;
-				if(op){
-					k=true;
-
-				}else{
-
-          k=setAvailable(_id1,"Waiting");
-    	}
+			
   
-         if(k){
-         delete	Preorderstart[_id1][_dateS];
-				 delete Preorderend[_id1][_dateS];
+       
+      
 				 uint256 i = suppPreorderOpen[_id1][_dateS];
 				 	if(PreorderOpen[_id1][i]==_dateS){
+				 	
+				 	if(op){	   
+				 		delete	Preorderstart[_id1][_dateS];
+				 		delete Preorderend[_id1][_dateS];
 				 		delete PreorderOpen[_id1][i];
 				 		delete suppPreorderOpen[_id1][_dateS];
-				 		Relese(_id1);
+						Relese(_id1);
+				}else{
+          setAvailable(_id1,"Waiting");
+    	}
 				 		return true;
 				 	}
-         } 
+         
        }
        return false;
 }
@@ -190,7 +190,7 @@ function Converter(uint256 date, bool next)public view virtual returns(uint256){
      uint256 lest;
      if(next)
      lest = 14400;
-    uint256 date1 = date % 86400; //tempo mod giorni
+    uint256 date1 = date % 86400; //tempo mod giorno
     date1= date1 % 14400;  //mod 4 ore
 		date1 = date - date1 + lest; //avro il giorno attuale + a mod di 4 ore
                                //es 6 nov - 0:00 - 4:00 - 8:00 - 12:00 - 16:00 ecc... 
@@ -229,7 +229,8 @@ function Acquire(address owner,uint256 idP,address usr,uint256 _dataF) public   
       return true;
 }
 
-return false;}
+return false;
+}
 
 	
 	function preOrderOpenGet(uint256 i) external  view virtual returns(uint256[] memory){
@@ -241,7 +242,8 @@ return false;}
 
 	// require(keccak256(bytes(Available[_id1])) == keccak256(bytes("Waiting")),"Ma cosa");
 	  bool k;
-	  if(!(CheckAvialable(_id1,time-90000,time+2592000))){//dataS -1 un giorno, dataE + 30gg 
+	  Time();
+	  if(!(CheckAvialable(_id1,time-2592000,time+2592000))){//dataS -1 un giorno, dataE + 30gg 
            k = setAvailable(_id1,"Preordered");
           require(k == true, "Non disponibile3");
           }else{
